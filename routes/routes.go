@@ -1,9 +1,8 @@
 package routes
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
+	"jay_medtronic/controllers"
 
 	"github.com/gorilla/mux"
 )
@@ -18,25 +17,8 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
-	{"CreateUser", "POST", "/api/v1/users", createUser},
-	{"Login", "POST", "/api/v1/login", loginUser},
-}
-
-func ToJSON(arg interface{}) []byte {
-	json, err := json.MarshalIndent(arg, "", "   ")
-	if err != nil {
-		fmt.Println(err)
-	}
-	return json
-}
-
-func createUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Create USER PATH")
-	w.Write(ToJSON("create user path"))
-}
-
-func loginUser(w http.ResponseWriter, r *http.Request) {
-
+	{"CreateUser", "POST", "/api/v1/users", users.CreateUser},
+	{"Login", "POST", "/api/v1/login", users.LoginUser},
 }
 
 func NewRouter() *mux.Router {
