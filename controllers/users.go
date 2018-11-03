@@ -31,6 +31,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Login User PATH")
-	w.Write(ToJSON("Login User path"))
+	data, err := user.Login(r.Body)
+	WriteResponse(data, err, 401, w)
 }
