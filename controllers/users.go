@@ -17,16 +17,10 @@ func ToJSON(arg interface{}) []byte {
 }
 
 func WriteResponse(data interface{}, err error, errorCode int, w http.ResponseWriter) {
-	enableCORS(&w)
 	if err != nil {
 		w.WriteHeader(errorCode)
 	}
 	w.Write(ToJSON(data))
-}
-
-func enableCORS(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
