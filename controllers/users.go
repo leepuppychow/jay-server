@@ -19,8 +19,6 @@ func ToJSON(arg interface{}) []byte {
 func WriteResponse(data interface{}, err error, errorCode int, w http.ResponseWriter) {
 	if err != nil {
 		w.WriteHeader(errorCode)
-		w.Write(ToJSON(err.Error()))
-		return
 	}
 	w.Write(ToJSON(data))
 }
