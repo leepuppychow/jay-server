@@ -24,11 +24,6 @@ type UserResponse struct {
 	Token   string `json:"token,omitempty"`
 }
 
-type UserClaims struct {
-	Email string `json:"email"`
-	jwt.StandardClaims
-}
-
 var password string
 
 func HashPassword(plainPW string) string {
@@ -81,17 +76,17 @@ func ValidateToken(tokenString string) (interface{}, bool) {
 func Create(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
-	hashedPW := HashPassword(user.Password)
 	err = MissingFields(user)
 
 	if err != nil {
 		return UserResponse{Message: err.Error()}, err
 	}
 
+	hashedPW := HashPassword(user.Password)
 	_, err = database.DB.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.Email, hashedPW)
 
 	if err != nil {
-		return UserResponse{Message: err.Error()}, err
+		return UserResponse{Message: "Unable to create user"}, err
 	} else {
 		return UserResponse{
 			Message: "User created successfully",
@@ -112,7 +107,7 @@ func Login(body io.Reader) (UserResponse, error) {
 	err = database.DB.QueryRow("SELECT password FROM users WHERE email=$1", user.Email).Scan(&password)
 
 	if err != nil {
-		return UserResponse{Message: err.Error()}, err
+		return UserResponse{Message: "Unable to find user"}, err
 	}
 
 	hashedPassword := password
