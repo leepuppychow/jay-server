@@ -52,7 +52,6 @@ func MissingFields(user User) error {
 
 func CreateToken(email string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": email})
-	// SignedString requires byte array not string as argument type
 	tokenString, err := token.SignedString([]byte(env.JWTSecret))
 	if err != nil {
 		fmt.Println("Error creating token:", err)

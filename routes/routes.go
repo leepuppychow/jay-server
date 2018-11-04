@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"net/http"
 	"jay_medtronic/controllers"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
