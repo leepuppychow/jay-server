@@ -12,8 +12,13 @@ import (
 
 type User struct {
 	Id       int
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type UserResponse struct {
+	Message string `json:"message"`
+	Token   string `json:"token,omitempty"`
 }
 
 var password string
@@ -42,41 +47,47 @@ func MissingFields(user User) error {
 	return err
 }
 
-func Create(body io.Reader) (string, error) {
+func Create(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
-	if err != nil {
-		log.Fatal("Error decoding body into JSON")
-	}
-	err = MissingFields(user)
 	hashedPW := HashPassword(user.Password)
-
+	err = MissingFields(user)
+	
 	if err != nil {
-		return "Error creating user", err
+		return UserResponse{ Message: err.Error() }, err
+	} 
+
+	_, err = database.DB.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.Email, hashedPW)
+	if err != nil {
+		return UserResponse{ Message: err.Error() }, err
 	} else {
-		_, err = database.DB.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.Email, hashedPW)
-		return "User created successfully", nil
+		return UserResponse{
+			Message: "User created successfully",
+			Token:   "WHEEE",
+		}, nil
 	}
 }
 
-func Login(body io.Reader) (string, error) {
+func Login(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
-	if err != nil {
-		log.Fatal("Error decoding body into JSON")
-	}
 	err = MissingFields(user)
+
 	if err != nil {
-		return "Missing fields", err
+		return UserResponse{ Message: err.Error() }, err
 	}
+
 	err = database.DB.QueryRow("SELECT password FROM users WHERE email=$1", user.Email).Scan(&password)
 	if err != nil {
-		return "Error searching for user", err
+		return UserResponse{ Message: err.Error() }, err
 	}
 	hashedPassword := password
 	_, err = ValidatePassword(hashedPassword, user.Password)
 	if err != nil {
-		return "Error with argon2 password validation", err
+		return UserResponse{ Message: err.Error() }, err
 	}
-	return "User is authenticated", nil
+	return UserResponse{
+		Message: "User is authenticated",
+		Token:   "WHEEE",
+	}, nil
 }
