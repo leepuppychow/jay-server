@@ -32,3 +32,8 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	data, err := user.Login(r.Body)
 	WriteResponse(data, err, 401, w)
 }
+
+func Test(w http.ResponseWriter, r *http.Request) {
+	data, err := user.Test(r.Header.Get("Authorization"))
+	WriteResponse(data, err, 401, w)
+}

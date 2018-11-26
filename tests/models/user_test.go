@@ -24,3 +24,13 @@ func TestValidateToken(t *testing.T) {
 		t.Errorf("ValidateToken test failed")
 	}
 }
+
+func TestValidatePassword(t *testing.T) {
+	pw := "hello"
+	hashedPW := user.HashPassword(pw)
+	valid, err := user.ValidatePassword(hashedPW, pw)
+
+	if !valid || err != nil {
+		t.Errorf("Validate Password failed")
+	}
+}

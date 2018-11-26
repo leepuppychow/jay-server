@@ -19,6 +19,8 @@ type Routes []Route
 var routes = Routes{
 	{"CreateUser", "POST", "/api/v1/users", users.CreateUser},
 	{"Login", "POST", "/api/v1/login", users.LoginUser},
+
+	{"test", "GET", "/api/v1/test", users.Test},
 }
 
 func NewRouter() *mux.Router {

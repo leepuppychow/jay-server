@@ -72,6 +72,14 @@ func ValidateToken(tokenString string) (interface{}, bool) {
 	return "Invalid token", false
 }
 
+func Test(authToken string) (interface{}, error) {
+	message, valid := ValidateToken(authToken)
+	if valid {
+		return message, nil
+	}
+	return "Not valid", errors.New("Invalid token")
+}
+
 func Create(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
@@ -83,8 +91,9 @@ func Create(body io.Reader) (UserResponse, error) {
 
 	hashedPW := HashPassword(user.Password)
 	_, err = database.DB.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.Email, hashedPW)
-
+	
 	if err != nil {
+		fmt.Println(err)
 		return UserResponse{Message: "Unable to create user"}, err
 	} else {
 		return UserResponse{
