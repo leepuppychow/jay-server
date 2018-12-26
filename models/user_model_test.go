@@ -1,4 +1,4 @@
-package main
+package models_test
 
 import (
 	"fmt"
