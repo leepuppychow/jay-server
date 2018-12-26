@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"jay_medtronic/database"
-	"jay_medtronic/env"
+	"github.com/leepuppychow/jay_medtronic/database"
+	"github.com/leepuppychow/jay_medtronic/env"
 	"log"
 
 	"github.com/dgrijalva/jwt-go"

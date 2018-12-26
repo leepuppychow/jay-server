@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	_ "jay_medtronic/database"
-	"jay_medtronic/env"
-	"jay_medtronic/routes"
+	_ "github.com/leepuppychow/jay_medtronic/database"
+	"github.com/leepuppychow/jay_medtronic/env"
+	"github.com/leepuppychow/jay_medtronic/routes"
 	"log"
 	"net/http"
 
