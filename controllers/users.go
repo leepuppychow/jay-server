@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"jay_medtronic/models"
+	"github.com/leepuppychow/jay_medtronic/models"
 
 	"fmt"
 	"net/http"

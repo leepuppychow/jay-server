@@ -2,7 +2,7 @@ package models_test
 
 import (
 	"fmt"
-	"jay_medtronic/models"
+	"github.com/leepuppychow/jay_medtronic/models"
 	"testing"
 )
 

@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"jay_medtronic/env"
+	"github.com/leepuppychow/jay_medtronic/env"
 	"log"
 
 	_ "github.com/lib/pq"
