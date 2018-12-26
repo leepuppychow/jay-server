@@ -1,4 +1,4 @@
-package users
+package controllers
 
 import (
 	"encoding/json"
@@ -24,16 +24,16 @@ func WriteResponse(data interface{}, err error, errorCode int, w http.ResponseWr
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	data, err := user.Create(r.Body)
+	data, err := models.CreateUser(r.Body)
 	WriteResponse(data, err, 422, w)
 }
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
-	data, err := user.Login(r.Body)
+	data, err := models.LoginUser(r.Body)
 	WriteResponse(data, err, 401, w)
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
-	data, err := user.Test(r.Header.Get("Authorization"))
+	data, err := models.TestAuth(r.Header.Get("Authorization"))
 	WriteResponse(data, err, 401, w)
 }

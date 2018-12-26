@@ -1,4 +1,4 @@
-package user
+package models
 
 import (
 	"encoding/json"
@@ -72,7 +72,7 @@ func ValidateToken(tokenString string) (interface{}, bool) {
 	return "Invalid token", false
 }
 
-func Test(authToken string) (interface{}, error) {
+func TestAuth(authToken string) (interface{}, error) {
 	message, valid := ValidateToken(authToken)
 	if valid {
 		return message, nil
@@ -80,7 +80,7 @@ func Test(authToken string) (interface{}, error) {
 	return "Not valid", errors.New("Invalid token")
 }
 
-func Create(body io.Reader) (UserResponse, error) {
+func CreateUser(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
 	err = MissingFields(user)
@@ -103,7 +103,7 @@ func Create(body io.Reader) (UserResponse, error) {
 	}
 }
 
-func Login(body io.Reader) (UserResponse, error) {
+func LoginUser(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
 	err = MissingFields(user)
