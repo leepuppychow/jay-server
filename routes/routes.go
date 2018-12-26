@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"net/http"
 	"jay_medtronic/controllers"
+	"net/http"
 
 	"github.com/gorilla/mux"
 )
@@ -17,8 +17,10 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
-	{"CreateUser", "POST", "/api/v1/users", users.CreateUser},
-	{"Login", "POST", "/api/v1/login", users.LoginUser},
+	{"CreateUser", "POST", "/api/v1/users", controllers.CreateUser},
+	{"Login", "POST", "/api/v1/login", controllers.LoginUser},
+
+	{"test", "GET", "/api/v1/test", controllers.Test},
 }
 
 func NewRouter() *mux.Router {

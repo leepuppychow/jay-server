@@ -1,4 +1,4 @@
-package user
+package models
 
 import (
 	"encoding/json"
@@ -52,7 +52,6 @@ func MissingFields(user User) error {
 
 func CreateToken(email string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": email})
-	// SignedString requires byte array not string as argument type
 	tokenString, err := token.SignedString([]byte(env.JWTSecret))
 	if err != nil {
 		fmt.Println("Error creating token:", err)
@@ -73,7 +72,15 @@ func ValidateToken(tokenString string) (interface{}, bool) {
 	return "Invalid token", false
 }
 
-func Create(body io.Reader) (UserResponse, error) {
+func TestAuth(authToken string) (interface{}, error) {
+	message, valid := ValidateToken(authToken)
+	if valid {
+		return message, nil
+	}
+	return "Not valid", errors.New("Invalid token")
+}
+
+func CreateUser(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
 	err = MissingFields(user)
@@ -86,6 +93,7 @@ func Create(body io.Reader) (UserResponse, error) {
 	_, err = database.DB.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.Email, hashedPW)
 
 	if err != nil {
+		fmt.Println(err)
 		return UserResponse{Message: "Unable to create user"}, err
 	} else {
 		return UserResponse{
@@ -95,7 +103,7 @@ func Create(body io.Reader) (UserResponse, error) {
 	}
 }
 
-func Login(body io.Reader) (UserResponse, error) {
+func LoginUser(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
 	err = MissingFields(user)

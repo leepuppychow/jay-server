@@ -8,7 +8,7 @@ import (
 
 func TestCreateToken(t *testing.T) {
 	email := "test@test.com"
-	token := user.CreateToken(email)
+	token := models.CreateToken(email)
 	fmt.Println(token)
 	if token == "" {
 		t.Errorf("CreateToken test failed")
@@ -17,10 +17,20 @@ func TestCreateToken(t *testing.T) {
 
 func TestValidateToken(t *testing.T) {
 	email := "test@test.com"
-	token := user.CreateToken(email)
+	token := models.CreateToken(email)
 
-	emailFromToken, valid := user.ValidateToken(token)
+	emailFromToken, valid := models.ValidateToken(token)
 	if !valid || emailFromToken != "test@test.com" {
 		t.Errorf("ValidateToken test failed")
+	}
+}
+
+func TestValidatePassword(t *testing.T) {
+	pw := "hello"
+	hashedPW := models.HashPassword(pw)
+	valid, err := models.ValidatePassword(hashedPW, pw)
+
+	if !valid || err != nil {
+		t.Errorf("Validate Password failed")
 	}
 }
