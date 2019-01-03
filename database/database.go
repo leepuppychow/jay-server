@@ -3,9 +3,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/leepuppychow/jay_medtronic/env"
 	"log"
 
+	"github.com/leepuppychow/jay_medtronic/env"
 	_ "github.com/lib/pq"
 )
 
