@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
+
 	"github.com/leepuppychow/jay_medtronic/database"
 	"github.com/leepuppychow/jay_medtronic/env"
-	"log"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/raja/argon2pw"
