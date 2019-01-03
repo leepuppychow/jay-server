@@ -91,7 +91,7 @@ func CreateUser(body io.Reader) (UserResponse, error) {
 	}
 
 	hashedPW := HashPassword(user.Password)
-	_, err = database.DB.Exec("INSERT INTO users (email, password) VALUES ($1, $2)", user.Email, hashedPW)
+	_, err = database.DB.Exec("INSERT INTO users (email, password, created_at, updated_at) VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)", user.Email, hashedPW)
 
 	if err != nil {
 		fmt.Println(err)
