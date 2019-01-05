@@ -3,9 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/leepuppychow/jay_medtronic/controllers"
-
 	"github.com/gorilla/mux"
+	"github.com/leepuppychow/jay_medtronic/controllers"
 )
 
 type Route struct {
@@ -20,6 +19,8 @@ type Routes []Route
 var routes = Routes{
 	{"CreateUser", "POST", "/api/v1/users", controllers.CreateUser},
 	{"Login", "POST", "/api/v1/login", controllers.LoginUser},
+	{"PapersIndex", "GET", "/api/v1/papers", controllers.PapersIndex},
+	// {"CreatePaper", "POST", "/api/v1/papers", controllers.CreatePaper},
 
 	{"test", "GET", "/api/v1/test", controllers.Test},
 }
