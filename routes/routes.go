@@ -17,6 +17,7 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
+	{"CheckToken", "GET", "/api/v1/checktoken", controllers.CheckToken},
 	{"CreateUser", "POST", "/api/v1/users", controllers.CreateUser},
 	{"Login", "POST", "/api/v1/login", controllers.LoginUser},
 	{"PapersIndex", "GET", "/api/v1/papers", controllers.PapersIndex},
