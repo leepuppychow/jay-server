@@ -48,7 +48,6 @@ func MissingFields(user User) error {
 	return err
 }
 
-
 func CreateUser(body io.Reader) (UserResponse, error) {
 	var user User
 	err := json.NewDecoder(body).Decode(&user)
