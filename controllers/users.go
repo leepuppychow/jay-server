@@ -22,6 +22,6 @@ func CheckToken(w http.ResponseWriter, r *http.Request) {
 	if valid {
 		WriteResponse("User Authenticated", nil, 200, w)
 	} else {
-		WriteResponse("Unauthorized", errors.New("Unauthorized"), 401, w)
+		WriteResponse("", errors.New("Unauthorized"), 401, w)
 	}
 }
