@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"github.com/leepuppychow/jay_medtronic/models"
-
+	"errors"
 	"net/http"
+
+	"github.com/leepuppychow/jay_medtronic/models"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -21,6 +22,6 @@ func CheckToken(w http.ResponseWriter, r *http.Request) {
 	if valid {
 		WriteResponse("User Authenticated", nil, 200, w)
 	} else {
-		WriteResponse("Unauthorized", nil, 401, w)
+		WriteResponse("Unauthorized", errors.New("Unauthorized"), 401, w)
 	}
 }
