@@ -3,8 +3,10 @@ package models
 import (
 	// "encoding/json"
 	// "errors"
+	"errors"
 	"fmt"
 	"time"
+
 	// "io"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -35,8 +37,13 @@ var (
 	updated_at                time.Time
 )
 
-func GetAllPapers() ([]Paper, error) {
+func GetAllPapers(authToken string) ([]Paper, error) {
 	var papers []Paper
+	// Check for valid JWT:
+	if !ValidToken(authToken) {
+		return papers, errors.New("Unauthorized")
+	}
+
 	query := "SELECT * FROM papers"
 	rows, err := database.DB.Query(query)
 	if err != nil {
