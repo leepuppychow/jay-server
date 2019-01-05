@@ -2,8 +2,9 @@ package models_test
 
 import (
 	"fmt"
-	"github.com/leepuppychow/jay_medtronic/models"
 	"testing"
+
+	"github.com/leepuppychow/jay_medtronic/models"
 )
 
 func TestCreateToken(t *testing.T) {
@@ -15,13 +16,13 @@ func TestCreateToken(t *testing.T) {
 	}
 }
 
-func TestValidateToken(t *testing.T) {
+func TestValidToken(t *testing.T) {
 	email := "test@test.com"
 	token := models.CreateToken(email)
 
-	emailFromToken, valid := models.ValidateToken(token)
-	if !valid || emailFromToken != "test@test.com" {
-		t.Errorf("ValidateToken test failed")
+	valid := models.ValidToken(token)
+	if !valid {
+		t.Errorf("ValidToken test failed")
 	}
 }
 

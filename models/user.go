@@ -8,9 +8,6 @@ import (
 	"log"
 
 	"github.com/leepuppychow/jay_medtronic/database"
-	"github.com/leepuppychow/jay_medtronic/env"
-
-	"github.com/dgrijalva/jwt-go"
 	"github.com/raja/argon2pw"
 )
 
@@ -51,35 +48,6 @@ func MissingFields(user User) error {
 	return err
 }
 
-func CreateToken(email string) string {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": email})
-	tokenString, err := token.SignedString([]byte(env.JWTSecret))
-	if err != nil {
-		fmt.Println("Error creating token:", err)
-	}
-	return tokenString
-}
-
-func ValidateToken(tokenString string) (interface{}, bool) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(env.JWTSecret), nil
-	})
-	if err != nil {
-		fmt.Println("Error validating token:", err)
-	}
-	if claims, ok := token.Claims.(jwt.MapClaims); token.Valid && ok {
-		return claims["email"], true
-	}
-	return "Invalid token", false
-}
-
-func TestAuth(authToken string) (interface{}, error) {
-	message, valid := ValidateToken(authToken)
-	if valid {
-		return message, nil
-	}
-	return "Not valid", errors.New("Invalid token")
-}
 
 func CreateUser(body io.Reader) (UserResponse, error) {
 	var user User
