@@ -15,7 +15,7 @@ type Author struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func GetAuthorsForPaper(paperId int) ([]Author, error) {
+func GetAuthorsForPaper(paperId int, channel chan []Author) {
 	var authors []Author
 	var (
 		id         int
@@ -55,8 +55,9 @@ func GetAuthorsForPaper(paperId int) ([]Author, error) {
 		}
 		authors = append(authors, author)
 	}
+
 	if err != nil {
-		return authors, err
+		fmt.Println("Error getting paper's authors", err)
 	}
-	return authors, nil
+	channel <- authors
 }

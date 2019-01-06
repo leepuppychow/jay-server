@@ -16,7 +16,7 @@ type Figure struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
-func GetFiguresForPaper(paperId int) ([]Figure, error) {
+func GetFiguresForPaper(paperId int, channel chan []Figure) {
 	var figures []Figure
 	var (
 		id          int
@@ -59,8 +59,9 @@ func GetFiguresForPaper(paperId int) ([]Figure, error) {
 		}
 		figures = append(figures, figure)
 	}
+
 	if err != nil {
-		return figures, err
+		fmt.Println("Error getting paper's figures", err)
 	}
-	return figures, nil
+	channel <- figures
 }

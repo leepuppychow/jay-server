@@ -76,15 +76,12 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		// Try to use go channels for
-		authors, err := GetAuthorsForPaper(id)
-		if err != nil {
-			fmt.Println("Error getting paper's authors", err)
-		}
-		figures, err := GetFiguresForPaper(id)
-		if err != nil {
-			fmt.Println("Error getting paper's figures", err)
-		}
+
+		authorsChannel := make(chan []Author)
+		figuresChannel := make(chan []Figure)
+		go GetAuthorsForPaper(id, authorsChannel)
+		go GetFiguresForPaper(id, figuresChannel)
+
 		paper := Paper{
 			Id:                      id,
 			Title:                   title,
@@ -97,8 +94,8 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			UpdatedAt:               updated_at.String(),
 			Study:                   study,
 			Device:                  device,
-			Authors:                 authors,
-			Figures:                 figures,
+			Authors:                 <- authorsChannel,
+			Figures:                 <- figuresChannel,
 		}
 		papers = append(papers, paper)
 	}
