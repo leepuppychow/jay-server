@@ -8,5 +8,5 @@ func NullTimeCheck(t pq.NullTime) string {
 	if t.Valid {
 		return t.Time.String()
 	}
-	return ""
+	return "NULL"
 }

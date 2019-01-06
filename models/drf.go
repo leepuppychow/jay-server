@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	"github.com/lib/pq"
 )
 
 type DataRequestForm struct {
@@ -25,10 +26,10 @@ func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm)
 		id                       int
 		paper_id                 int
 		round                    int
-		form_completed           time.Time
-		requested_delivery       time.Time
-		actual_delivery          time.Time
-		data_refinement_complete time.Time
+		form_completed           pq.NullTime
+		requested_delivery       pq.NullTime
+		actual_delivery          pq.NullTime
+		data_refinement_complete pq.NullTime
 		created_at               time.Time
 		updated_at               time.Time
 	)
@@ -61,10 +62,10 @@ func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm)
 			Id:                     id,
 			PaperId:                paper_id,
 			Round:                  round,
-			FormCompleted:          form_completed.String(),
-			RequestedDelivery:      requested_delivery.String(),
-			ActualDelivery:         actual_delivery.String(),
-			DataRefinementComplete: data_refinement_complete.String(),
+			FormCompleted:          NullTimeCheck(form_completed),
+			RequestedDelivery:      NullTimeCheck(requested_delivery),
+			ActualDelivery:         NullTimeCheck(actual_delivery),
+			DataRefinementComplete: NullTimeCheck(data_refinement_complete),
 			CreatedAt:              created_at.String(),
 			UpdatedAt:              updated_at.String(),
 		}
