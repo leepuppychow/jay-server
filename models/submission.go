@@ -31,8 +31,8 @@ func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
 		journal_id               int
 		journal_name             string
 		attempt                  int
-		manuscript_submitted     time.Time
-		manuscript_feedback_date time.Time
+		manuscript_submitted     pq.NullTime
+		manuscript_feedback_date pq.NullTime
 		accepted                 bool
 		manuscript_epub          pq.NullTime
 		manuscript_printed       pq.NullTime
@@ -74,8 +74,8 @@ func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
 			JournalId:              journal_id,
 			JournalName:            journal_name,
 			Attempt:                attempt,
-			ManuscriptSubmitted:    manuscript_submitted.String(),
-			ManuscriptFeedbackDate: manuscript_feedback_date.String(),
+			ManuscriptSubmitted:    NullTimeCheck(manuscript_submitted),
+			ManuscriptFeedbackDate: NullTimeCheck(manuscript_feedback_date),
 			Accepted:               accepted,
 			ManuscriptEpub:         NullTimeCheck(manuscript_epub),
 			ManuscriptPrinted:      NullTimeCheck(manuscript_printed),

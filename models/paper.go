@@ -1,15 +1,12 @@
 package models
 
 import (
-	// "encoding/json"
-	// "errors"
 	"errors"
 	"fmt"
 	"time"
 
-	// "io"
-
 	"github.com/leepuppychow/jay_medtronic/database"
+	"github.com/lib/pq"
 )
 
 type Paper struct {
@@ -37,8 +34,8 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		title                     string
 		study_id                  int
 		device_id                 int
-		initial_request_evaluated time.Time
-		manuscript_drafted        time.Time
+		initial_request_evaluated pq.NullTime
+		manuscript_drafted        pq.NullTime
 		int_ext_erp               string
 		created_at                time.Time
 		updated_at                time.Time
@@ -93,8 +90,8 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			Title:                   title,
 			Study_Id:                study_id,
 			Device_Id:               device_id,
-			InitialRequestEvaluated: initial_request_evaluated.String(),
-			ManuscriptDrafted:       manuscript_drafted.String(),
+			InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
+			ManuscriptDrafted:       NullTimeCheck(manuscript_drafted),
 			IntExtErp:               int_ext_erp,
 			CreatedAt:               created_at.String(),
 			UpdatedAt:               updated_at.String(),
