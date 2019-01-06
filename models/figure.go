@@ -8,7 +8,7 @@ import (
 )
 
 type Figure struct {
-	Id         int
+	Id         int    `json:"id"`
 	Name       string `json:"name"`
 	FigureType string `json:"figure_type"`
 	ImageFile  string `json:"image_file"`

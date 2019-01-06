@@ -13,7 +13,7 @@ import (
 )
 
 type Paper struct {
-	Id                      int
+	Id                      int               `json:"id"`
 	Title                   string            `json:"title"`
 	Study_Id                int               `json:"study_id"`
 	Device_Id               int               `json:"device_id"`
@@ -27,6 +27,7 @@ type Paper struct {
 	Authors                 []Author          `json:"authors"`
 	Figures                 []Figure          `json:"figures"`
 	DataRequestForms        []DataRequestForm `json:"data_request_forms"`
+	Submissions             []Submission      `json:"submissions"`
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
@@ -81,9 +82,11 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		authorsChannel := make(chan []Author)
 		figuresChannel := make(chan []Figure)
 		drfChannel := make(chan []DataRequestForm)
+		submissionChannel := make(chan []Submission)
 		go GetAuthorsForPaper(id, authorsChannel)
 		go GetFiguresForPaper(id, figuresChannel)
 		go GetDataRequestFormsForPaper(id, drfChannel)
+		go GetSubmissionsForPaper(id, submissionChannel)
 
 		paper := Paper{
 			Id:                      id,
@@ -100,6 +103,7 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			Authors:                 <-authorsChannel,
 			Figures:                 <-figuresChannel,
 			DataRequestForms:        <-drfChannel,
+			Submissions:             <-submissionChannel,
 		}
 		papers = append(papers, paper)
 	}

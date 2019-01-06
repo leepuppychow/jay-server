@@ -8,9 +8,9 @@ import (
 )
 
 type DataRequestForm struct {
-	Id                     int
-	PaperId                int
-	Round                  int
+	Id                     int    `json:"id"`
+	PaperId                int    `json:"paper_id"`
+	Round                  int    `json:"round"`
 	FormCompleted          string `json:"form_completed"`
 	RequestedDelivery      string `json:"requested_delivery"`
 	ActualDelivery         string `json:"actual_delivery"`
@@ -72,7 +72,7 @@ func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm)
 	}
 
 	if err != nil {
-		fmt.Println("Error getting paper's figures", err)
+		fmt.Println("Error getting paper's DRFs", err)
 	}
 	kawaiiChan <- DRFs
 }
