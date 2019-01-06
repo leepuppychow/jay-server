@@ -25,6 +25,7 @@ type Paper struct {
 	Study                   string   `json:"study"`
 	Device                  string   `json:"device"`
 	Authors                 []Author `json:"authors"`
+	Figures                 []Figure `json:"figures"`
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
@@ -75,9 +76,14 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		if err != nil {
 			fmt.Println(err)
 		}
+		// Try to use go channels for
 		authors, err := GetAuthorsForPaper(id)
 		if err != nil {
 			fmt.Println("Error getting paper's authors", err)
+		}
+		figures, err := GetFiguresForPaper(id)
+		if err != nil {
+			fmt.Println("Error getting paper's figures", err)
 		}
 		paper := Paper{
 			Id:                      id,
@@ -92,9 +98,9 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			Study:                   study,
 			Device:                  device,
 			Authors:                 authors,
+			Figures:                 figures,
 		}
 		papers = append(papers, paper)
-
 	}
 	if err != nil {
 		return papers, err
