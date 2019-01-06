@@ -8,14 +8,14 @@ import (
 )
 
 type Author struct {
-	Id        int
+	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
 
-func GetAuthorsForPaper(paperId int, channel chan []Author) {
+func GetAuthorsForPaper(paperId int, kawaiiChan chan []Author) {
 	var authors []Author
 	var (
 		id         int
@@ -59,5 +59,5 @@ func GetAuthorsForPaper(paperId int, channel chan []Author) {
 	if err != nil {
 		fmt.Println("Error getting paper's authors", err)
 	}
-	channel <- authors
+	kawaiiChan <- authors
 }

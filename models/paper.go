@@ -13,19 +13,21 @@ import (
 )
 
 type Paper struct {
-	Id                      int
-	Title                   string   `json:"title"`
-	Study_Id                int      `json:"study_id"`
-	Device_Id               int      `json:"device_id"`
-	InitialRequestEvaluated string   `json:"initial_request_evaluated"`
-	ManuscriptDrafted       string   `json:"manuscript_drafted"`
-	IntExtErp               string   `json:"int_ext_erp"`
-	CreatedAt               string   `json:"created_at"`
-	UpdatedAt               string   `json:"updated_at"`
-	Study                   string   `json:"study"`
-	Device                  string   `json:"device"`
-	Authors                 []Author `json:"authors"`
-	Figures                 []Figure `json:"figures"`
+	Id                      int               `json:"id"`
+	Title                   string            `json:"title"`
+	Study_Id                int               `json:"study_id"`
+	Device_Id               int               `json:"device_id"`
+	InitialRequestEvaluated string            `json:"initial_request_evaluated"`
+	ManuscriptDrafted       string            `json:"manuscript_drafted"`
+	IntExtErp               string            `json:"int_ext_erp"`
+	CreatedAt               string            `json:"created_at"`
+	UpdatedAt               string            `json:"updated_at"`
+	Study                   string            `json:"study"`
+	Device                  string            `json:"device"`
+	Authors                 []Author          `json:"authors"`
+	Figures                 []Figure          `json:"figures"`
+	DataRequestForms        []DataRequestForm `json:"data_request_forms"`
+	Submissions             []Submission      `json:"submissions"`
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
@@ -79,8 +81,12 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 
 		authorsChannel := make(chan []Author)
 		figuresChannel := make(chan []Figure)
+		drfChannel := make(chan []DataRequestForm)
+		submissionChannel := make(chan []Submission)
 		go GetAuthorsForPaper(id, authorsChannel)
 		go GetFiguresForPaper(id, figuresChannel)
+		go GetDataRequestFormsForPaper(id, drfChannel)
+		go GetSubmissionsForPaper(id, submissionChannel)
 
 		paper := Paper{
 			Id:                      id,
@@ -94,8 +100,10 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			UpdatedAt:               updated_at.String(),
 			Study:                   study,
 			Device:                  device,
-			Authors:                 <- authorsChannel,
-			Figures:                 <- figuresChannel,
+			Authors:                 <-authorsChannel,
+			Figures:                 <-figuresChannel,
+			DataRequestForms:        <-drfChannel,
+			Submissions:             <-submissionChannel,
 		}
 		papers = append(papers, paper)
 	}

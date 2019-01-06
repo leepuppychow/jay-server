@@ -8,7 +8,7 @@ import (
 )
 
 type Figure struct {
-	Id         int
+	Id         int    `json:"id"`
 	Name       string `json:"name"`
 	FigureType string `json:"figure_type"`
 	ImageFile  string `json:"image_file"`
@@ -16,7 +16,7 @@ type Figure struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
-func GetFiguresForPaper(paperId int, channel chan []Figure) {
+func GetFiguresForPaper(paperId int, kawaiiChan chan []Figure) {
 	var figures []Figure
 	var (
 		id          int
@@ -63,5 +63,5 @@ func GetFiguresForPaper(paperId int, channel chan []Figure) {
 	if err != nil {
 		fmt.Println("Error getting paper's figures", err)
 	}
-	channel <- figures
+	kawaiiChan <- figures
 }
