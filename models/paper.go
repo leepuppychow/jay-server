@@ -1,8 +1,10 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -110,6 +112,34 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 	return papers, nil
 }
 
-// func CreatePaper(body io.Reader) {
+func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
 
-// }
+	var paper Paper
+	err := json.NewDecoder(body).Decode(&paper)
+
+	if err != nil {
+		return GeneralResponse{Message: err.Error()}, err
+	}
+	queryString := `
+		INSERT INTO papers (
+			title,
+			study_id,
+			device_id, 
+			initial_request_evaluated,
+			manuscript_drafted,
+			int_ext_erp
+		)
+		VALUES ($1, $2, $3, $4, $5, $6)
+	`
+	_, err = database.DB.Exec(queryString)
+
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: "Unable to create paper"}, err
+	} else {
+		return GeneralResponse{Message: "Paper created successfully"}, nil
+	}
+}

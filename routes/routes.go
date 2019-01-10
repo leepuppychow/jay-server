@@ -21,7 +21,7 @@ var routes = Routes{
 	{"CreateUser", "POST", "/api/v1/users", controllers.CreateUser},
 	{"Login", "POST", "/api/v1/login", controllers.LoginUser},
 	{"PapersIndex", "GET", "/api/v1/papers", controllers.PapersIndex},
-	// {"CreatePaper", "POST", "/api/v1/papers", controllers.CreatePaper},
+	{"CreatePaper", "POST", "/api/v1/papers", controllers.CreatePaper},
 }
 
 func NewRouter() *mux.Router {
