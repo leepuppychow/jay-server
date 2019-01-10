@@ -11,7 +11,7 @@ func PapersIndex(w http.ResponseWriter, r *http.Request) {
 	WriteResponse(data, err, 400, w)
 }
 
-// func CreatePaper(w http.ResponseWriter, r *http.Request) {
-// 	data, err := models.CreatePaper(r.Body)
-// 	WriteResponse(data, err, 422, w)
-// }
+func CreatePaper(w http.ResponseWriter, r *http.Request) {
+	data, err := models.CreatePaper(r.Body, r.Header.Get("Authorization"))
+	WriteResponse(data, err, 422, w)
+}
