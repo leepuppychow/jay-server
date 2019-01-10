@@ -117,8 +117,8 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
 	// }
 
-	var paper Paper
-	err := json.NewDecoder(body).Decode(&paper)
+	var p Paper
+	err := json.NewDecoder(body).Decode(&p)
 
 	if err != nil {
 		return GeneralResponse{Message: err.Error()}, err
@@ -130,11 +130,19 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 			device_id, 
 			initial_request_evaluated,
 			manuscript_drafted,
-			int_ext_erp
+			int_ext_erp,
+			created_at,
+			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 	`
-	_, err = database.DB.Exec(queryString)
+	_, err = database.DB.Exec(queryString,
+		p.Title,
+		p.Study_Id,
+		p.Device_Id,
+		p.InitialRequestEvaluated,
+		p.ManuscriptDrafted,
+		p.IntExtErp)
 
 	if err != nil {
 		fmt.Println(err)
