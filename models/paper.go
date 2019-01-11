@@ -2,7 +2,7 @@ package models
 
 import (
 	"encoding/json"
-	"errors"
+	// "errors"
 	"fmt"
 	"io"
 	"time"
@@ -45,9 +45,9 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		device                    string
 	)
 	// Check for valid JWT:
-	if !ValidToken(authToken) {
-		return papers, errors.New("Unauthorized")
-	}
+	// if !ValidToken(authToken) {
+	// 	return papers, errors.New("Unauthorized")
+	// }
 
 	query := `
 		SELECT papers.*, studies.name AS study, devices.name AS device FROM papers 
