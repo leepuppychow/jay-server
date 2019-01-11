@@ -2,7 +2,7 @@ package models
 
 import (
 	"encoding/json"
-	// "errors"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -109,6 +109,7 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 	if err != nil {
 		return papers, err
 	}
+	fmt.Println("Successful GET to paper index")
 	return papers, nil
 }
 
@@ -116,7 +117,6 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 	// if !ValidToken(authToken) {
 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
 	// }
-
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 
@@ -148,6 +148,25 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 		fmt.Println(err)
 		return GeneralResponse{Message: "Unable to create paper"}, err
 	} else {
+		fmt.Println("Successful POST to create paper")
 		return GeneralResponse{Message: "Paper created successfully"}, nil
 	}
+}
+
+func DeletePaper(id int, authToken string) (GeneralResponse, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
+	queryString := `DELETE FROM papers WHERE id=$1`
+	res, err := database.DB.Exec(queryString, id)
+	rowCount, err := res.RowsAffected()
+
+	if rowCount == 0 {
+		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
+		err = errors.New("Did not find row with specified ID")
+		return GeneralResponse{Message: errorMessage}, err
+	} else if err != nil {
+		return GeneralResponse{Message: "Error with DELETE request"}, err
+	}
+	return GeneralResponse{Message: "Paper deleted successfully"}, nil
 }

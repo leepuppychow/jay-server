@@ -22,6 +22,7 @@ var routes = Routes{
 	{"Login", "POST", "/api/v1/login", controllers.LoginUser},
 	{"PapersIndex", "GET", "/api/v1/papers", controllers.PapersIndex},
 	{"CreatePaper", "POST", "/api/v1/papers", controllers.CreatePaper},
+	{"DeletePaper", "DELETE", "/api/v1/papers/{id}", controllers.DeletePaper},
 	{"AuthorsIndex", "POST", "/api/v1/authors", controllers.AuthorsIndex},
 	{"CreateAuthor", "POST", "/api/v1/authors", controllers.CreateAuthor},
 }
