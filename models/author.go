@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -13,6 +14,17 @@ type Author struct {
 	LastName  string `json:"last_name"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
+}
+
+func GetAllAuthors(authToken string) ([]Author, error) {
+	var authors []Author
+
+	return authors, nil
+}
+
+func CreateAuthor(body io.Reader, authToken string) (GeneralResponse, error) {
+
+	return GeneralResponse{Message: "TODO"}, nil
 }
 
 func GetAuthorsForPaper(paperId int, kawaiiChan chan []Author) {
