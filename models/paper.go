@@ -44,7 +44,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		study                     string
 		device                    string
 	)
-	// Check for valid JWT:
 	// if !ValidToken(authToken) {
 	// 	return papers, errors.New("Unauthorized")
 	// }
@@ -113,6 +112,77 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 	return papers, nil
 }
 
+func FindPaper(paperId int, authToken string) (interface{}, error) {
+	// if !ValidToken(authToken) {
+	// 	return papers, errors.New("Unauthorized")
+	// }
+	var (
+		id                        int
+		title                     string
+		study_id                  int
+		device_id                 int
+		initial_request_evaluated pq.NullTime
+		manuscript_drafted        pq.NullTime
+		int_ext_erp               string
+		created_at                time.Time
+		updated_at                time.Time
+		study                     string
+		device                    string
+	)
+
+	queryString := `
+		SELECT papers.*, studies.name AS study, devices.name AS device FROM papers 
+		INNER JOIN studies ON papers.study_id = studies.id
+		INNER JOIN devices ON papers.device_id = devices.id
+		WHERE papers.id=$1;
+	`
+	err := database.DB.QueryRow(queryString, paperId).Scan(
+		&id,
+		&title,
+		&study_id,
+		&device_id,
+		&initial_request_evaluated,
+		&manuscript_drafted,
+		&int_ext_erp,
+		&created_at,
+		&updated_at,
+		&study,
+		&device,
+	)
+	authorsChannel := make(chan []Author)
+	figuresChannel := make(chan []Figure)
+	drfChannel := make(chan []DataRequestForm)
+	submissionChannel := make(chan []Submission)
+	go GetAuthorsForPaper(id, authorsChannel)
+	go GetFiguresForPaper(id, figuresChannel)
+	go GetDataRequestFormsForPaper(id, drfChannel)
+	go GetSubmissionsForPaper(id, submissionChannel)
+
+	paper := Paper{
+		Id:                      id,
+		Title:                   title,
+		Study_Id:                study_id,
+		Device_Id:               device_id,
+		InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
+		ManuscriptDrafted:       NullTimeCheck(manuscript_drafted),
+		IntExtErp:               int_ext_erp,
+		CreatedAt:               created_at.String(),
+		UpdatedAt:               updated_at.String(),
+		Study:                   study,
+		Device:                  device,
+		Authors:                 <-authorsChannel,
+		Figures:                 <-figuresChannel,
+		DataRequestForms:        <-drfChannel,
+		Submissions:             <-submissionChannel,
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: "Error finding paper"}, err
+	}
+	return paper, nil
+}
+
 func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 	// if !ValidToken(authToken) {
 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
@@ -175,7 +245,7 @@ func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, err
 			updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
-	_, err = database.DB.Exec(queryString, 
+	_, err = database.DB.Exec(queryString,
 		id,
 		p.Title,
 		p.Study_Id,
