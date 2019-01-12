@@ -1,10 +1,10 @@
 package models
 
 import (
-	// "encoding/json"
-	// "errors"
+	"encoding/json"
+	"errors"
 	"fmt"
-	// "io"
+	"io"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -35,6 +35,9 @@ type Paper struct {
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
+	// if !ValidToken(authToken) {
+	// 	return papers, errors.New("Unauthorized")
+	// }
 	var papers []Paper
 	var (
 		id                        int
@@ -54,10 +57,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		study                     string
 		journal                   string
 	)
-	// if !ValidToken(authToken) {
-	// 	return papers, errors.New("Unauthorized")
-	// }
-
 	query := `
 		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
@@ -219,45 +218,57 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	return paper, nil
 }
 
-// func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
-// 	// if !ValidToken(authToken) {
-// 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-// 	// }
-// 	var p Paper
-// 	err := json.NewDecoder(body).Decode(&p)
+func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
+	fmt.Println("CREATE PAPER MODEL ACTION")
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
+	var p Paper
+	err := json.NewDecoder(body).Decode(&p)
 
-// 	if err != nil {
-// 		return GeneralResponse{Message: err.Error()}, err
-// 	}
-// 	queryString := `
-// 		INSERT INTO papers (
-// 			title,
-// 			study_id,
-// 			device_id, 
-// 			initial_request_evaluated,
-// 			manuscript_drafted,
-// 			int_ext_erp,
-// 			created_at,
-// 			updated_at
-// 		)
-// 		VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-// 	`
-// 	_, err = database.DB.Exec(queryString,
-// 		p.Title,
-// 		p.Study_Id,
-// 		p.Device_Id,
-// 		p.InitialRequestEvaluated,
-// 		p.ManuscriptDrafted,
-// 		p.IntExtErp)
+	if err != nil {
+		return GeneralResponse{Message: err.Error()}, err
+	}
+	queryString := `
+		INSERT INTO papers (
+			title,
+			study_id,
+			journal_id, 
+			initial_request_evaluated,
+			manuscript_drafted,
+			manuscript_submitted,
+			manuscript_accepted,
+			manuscript_epub,
+			manuscript_printed,
+			submission_attempts,
+			int_ext_erp,
+			created_at,
+			updated_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	`
+	_, err = database.DB.Exec(queryString,
+		p.Title,
+		p.Study_Id,
+		p.Journal_Id,
+		p.InitialRequestEvaluated,
+		p.ManuscriptDrafted,
+		p.ManuscriptSubmitted,
+		p.ManuscriptAccepted,
+		p.ManuscriptEpub,
+		p.ManuscriptPrinted,
+		p.SubmissionAttempts,
+		p.IntExtErp,
+	)
 
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return GeneralResponse{Message: "Unable to create paper"}, err
-// 	} else {
-// 		fmt.Println("Successful POST to create paper")
-// 		return GeneralResponse{Message: "Paper created successfully"}, nil
-// 	}
-// }
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: "Unable to create paper"}, err
+	} else {
+		fmt.Println("Successful POST to create paper")
+		return GeneralResponse{Message: "Paper created successfully"}, nil
+	}
+}
 
 // func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
 // 	// if !ValidToken(authToken) {
@@ -271,7 +282,7 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 
 // 	queryString := `
 // 		UPDATE papers
-// 		SET 
+// 		SET
 // 			title = $2,
 // 			study_id = $3,
 // 			device_id = $4,
@@ -300,20 +311,20 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 // 	}
 // }
 
-// func DeletePaper(id int, authToken string) (GeneralResponse, error) {
-// 	// if !ValidToken(authToken) {
-// 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-// 	// }
-// 	queryString := `DELETE FROM papers WHERE id=$1`
-// 	res, err := database.DB.Exec(queryString, id)
-// 	rowCount, err := res.RowsAffected()
+func DeletePaper(id int, authToken string) (GeneralResponse, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
+	queryString := `DELETE FROM papers WHERE id=$1`
+	res, err := database.DB.Exec(queryString, id)
+	rowCount, err := res.RowsAffected()
 
-// 	if rowCount == 0 {
-// 		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
-// 		err = errors.New("Did not find row with specified ID")
-// 		return GeneralResponse{Message: errorMessage}, err
-// 	} else if err != nil {
-// 		return GeneralResponse{Message: "Error with DELETE request"}, err
-// 	}
-// 	return GeneralResponse{Message: "Paper deleted successfully"}, nil
-// }
+	if rowCount == 0 {
+		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
+		err = errors.New("Did not find row with specified ID")
+		return GeneralResponse{Message: errorMessage}, err
+	} else if err != nil {
+		return GeneralResponse{Message: "Error with DELETE request"}, err
+	}
+	return GeneralResponse{Message: "Paper deleted successfully"}, nil
+}
