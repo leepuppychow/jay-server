@@ -1,10 +1,10 @@
 package models
 
 import (
-	"encoding/json"
-	"errors"
+	// "encoding/json"
+	// "errors"
 	"fmt"
-	"io"
+	// "io"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -15,18 +15,23 @@ type Paper struct {
 	Id                      int               `json:"id"`
 	Title                   string            `json:"title"`
 	Study_Id                int               `json:"study_id"`
-	Device_Id               int               `json:"device_id"`
+	Journal_Id              int               `json:"journal_id"`
 	InitialRequestEvaluated string            `json:"initial_request_evaluated"`
 	ManuscriptDrafted       string            `json:"manuscript_drafted"`
+	ManuscriptSubmitted     string            `json:"manuscript_submitted"`
+	ManuscriptAccepted      string            `json:"manuscript_accepted"`
+	ManuscriptEpub          string            `json:"manuscript_epub"`
+	ManuscriptPrinted       string            `json:"manuscript_printed"`
+	SubmissionAttempts      int               `json:"submission_attempts"`
 	IntExtErp               string            `json:"int_ext_erp"`
 	CreatedAt               string            `json:"created_at"`
 	UpdatedAt               string            `json:"updated_at"`
 	Study                   string            `json:"study"`
-	Device                  string            `json:"device"`
+	Journal                 string            `json:"journal"`
+	Devices                 []Device          `json:"devices"`
 	Authors                 []Author          `json:"authors"`
 	Figures                 []Figure          `json:"figures"`
 	DataRequestForms        []DataRequestForm `json:"data_request_forms"`
-	Submissions             []Submission      `json:"submissions"`
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
@@ -35,23 +40,28 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		id                        int
 		title                     string
 		study_id                  int
-		device_id                 int
+		journal_id                int
 		initial_request_evaluated pq.NullTime
 		manuscript_drafted        pq.NullTime
+		manuscript_submitted      pq.NullTime
+		manuscript_accepted       pq.NullTime
+		manuscript_epub           pq.NullTime
+		manuscript_printed        pq.NullTime
+		submission_attempts       int
 		int_ext_erp               string
 		created_at                time.Time
 		updated_at                time.Time
 		study                     string
-		device                    string
+		journal                   string
 	)
 	// if !ValidToken(authToken) {
 	// 	return papers, errors.New("Unauthorized")
 	// }
 
 	query := `
-		SELECT papers.*, studies.name AS study, devices.name AS device FROM papers 
+		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
-		INNER JOIN devices ON papers.device_id = devices.id;
+		INNER JOIN journals ON papers.journal_id = journals.id;
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -64,14 +74,19 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			&id,
 			&title,
 			&study_id,
-			&device_id,
+			&journal_id,
 			&initial_request_evaluated,
 			&manuscript_drafted,
+			&manuscript_submitted,
+			&manuscript_accepted,
+			&manuscript_epub,
+			&manuscript_printed,
+			&submission_attempts,
 			&int_ext_erp,
 			&created_at,
 			&updated_at,
 			&study,
-			&device,
+			&journal,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -80,28 +95,33 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		authorsChannel := make(chan []Author)
 		figuresChannel := make(chan []Figure)
 		drfChannel := make(chan []DataRequestForm)
-		submissionChannel := make(chan []Submission)
+		devicesChannel := make(chan []Device)
 		go GetAuthorsForPaper(id, authorsChannel)
 		go GetFiguresForPaper(id, figuresChannel)
 		go GetDataRequestFormsForPaper(id, drfChannel)
-		go GetSubmissionsForPaper(id, submissionChannel)
+		go GetDevicesForPaper(id, devicesChannel)
 
 		paper := Paper{
 			Id:                      id,
 			Title:                   title,
 			Study_Id:                study_id,
-			Device_Id:               device_id,
+			Journal_Id:              journal_id,
 			InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
 			ManuscriptDrafted:       NullTimeCheck(manuscript_drafted),
+			ManuscriptSubmitted:     NullTimeCheck(manuscript_submitted),
+			ManuscriptAccepted:      NullTimeCheck(manuscript_accepted),
+			ManuscriptEpub:          NullTimeCheck(manuscript_epub),
+			ManuscriptPrinted:       NullTimeCheck(manuscript_printed),
+			SubmissionAttempts:      submission_attempts,
 			IntExtErp:               int_ext_erp,
 			CreatedAt:               created_at.String(),
 			UpdatedAt:               updated_at.String(),
 			Study:                   study,
-			Device:                  device,
+			Journal:                 journal,
 			Authors:                 <-authorsChannel,
 			Figures:                 <-figuresChannel,
 			DataRequestForms:        <-drfChannel,
-			Submissions:             <-submissionChannel,
+			Devices:                 <-devicesChannel,
 		}
 		papers = append(papers, paper)
 	}
@@ -120,60 +140,76 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		id                        int
 		title                     string
 		study_id                  int
-		device_id                 int
+		journal_id                int
 		initial_request_evaluated pq.NullTime
 		manuscript_drafted        pq.NullTime
+		manuscript_submitted      pq.NullTime
+		manuscript_accepted       pq.NullTime
+		manuscript_epub           pq.NullTime
+		manuscript_printed        pq.NullTime
+		submission_attempts       int
 		int_ext_erp               string
 		created_at                time.Time
 		updated_at                time.Time
 		study                     string
-		device                    string
+		journal                   string
 	)
 
 	queryString := `
-		SELECT papers.*, studies.name AS study, devices.name AS device FROM papers 
+		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
-		INNER JOIN devices ON papers.device_id = devices.id
+		INNER JOIN journals ON papers.journal_id = journals.id
 		WHERE papers.id=$1;
 	`
 	err := database.DB.QueryRow(queryString, paperId).Scan(
 		&id,
 		&title,
 		&study_id,
-		&device_id,
+		&journal_id,
 		&initial_request_evaluated,
 		&manuscript_drafted,
+		&manuscript_submitted,
+		&manuscript_accepted,
+		&manuscript_epub,
+		&manuscript_printed,
+		&submission_attempts,
 		&int_ext_erp,
 		&created_at,
 		&updated_at,
 		&study,
-		&device,
+		&journal,
 	)
+
 	authorsChannel := make(chan []Author)
 	figuresChannel := make(chan []Figure)
 	drfChannel := make(chan []DataRequestForm)
-	submissionChannel := make(chan []Submission)
+	devicesChannel := make(chan []Device)
 	go GetAuthorsForPaper(id, authorsChannel)
 	go GetFiguresForPaper(id, figuresChannel)
 	go GetDataRequestFormsForPaper(id, drfChannel)
-	go GetSubmissionsForPaper(id, submissionChannel)
+	go GetDevicesForPaper(id, devicesChannel)
 
 	paper := Paper{
 		Id:                      id,
 		Title:                   title,
 		Study_Id:                study_id,
-		Device_Id:               device_id,
+		Journal_Id:              journal_id,
 		InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
 		ManuscriptDrafted:       NullTimeCheck(manuscript_drafted),
+		ManuscriptSubmitted:     NullTimeCheck(manuscript_submitted),
+		ManuscriptAccepted:      NullTimeCheck(manuscript_accepted),
+		ManuscriptEpub:          NullTimeCheck(manuscript_epub),
+		ManuscriptPrinted:       NullTimeCheck(manuscript_printed),
+		SubmissionAttempts:      submission_attempts,
 		IntExtErp:               int_ext_erp,
 		CreatedAt:               created_at.String(),
 		UpdatedAt:               updated_at.String(),
 		Study:                   study,
-		Device:                  device,
+		Journal:                 journal,
 		Authors:                 <-authorsChannel,
 		Figures:                 <-figuresChannel,
 		DataRequestForms:        <-drfChannel,
-		Submissions:             <-submissionChannel,
+		Devices:                 <-devicesChannel,
 	}
 
 	if err != nil {
@@ -183,101 +219,101 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	return paper, nil
 }
 
-func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
-	var p Paper
-	err := json.NewDecoder(body).Decode(&p)
+// func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
+// 	// if !ValidToken(authToken) {
+// 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+// 	// }
+// 	var p Paper
+// 	err := json.NewDecoder(body).Decode(&p)
 
-	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
-	}
-	queryString := `
-		INSERT INTO papers (
-			title,
-			study_id,
-			device_id, 
-			initial_request_evaluated,
-			manuscript_drafted,
-			int_ext_erp,
-			created_at,
-			updated_at
-		)
-		VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	`
-	_, err = database.DB.Exec(queryString,
-		p.Title,
-		p.Study_Id,
-		p.Device_Id,
-		p.InitialRequestEvaluated,
-		p.ManuscriptDrafted,
-		p.IntExtErp)
+// 	if err != nil {
+// 		return GeneralResponse{Message: err.Error()}, err
+// 	}
+// 	queryString := `
+// 		INSERT INTO papers (
+// 			title,
+// 			study_id,
+// 			device_id, 
+// 			initial_request_evaluated,
+// 			manuscript_drafted,
+// 			int_ext_erp,
+// 			created_at,
+// 			updated_at
+// 		)
+// 		VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+// 	`
+// 	_, err = database.DB.Exec(queryString,
+// 		p.Title,
+// 		p.Study_Id,
+// 		p.Device_Id,
+// 		p.InitialRequestEvaluated,
+// 		p.ManuscriptDrafted,
+// 		p.IntExtErp)
 
-	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: "Unable to create paper"}, err
-	} else {
-		fmt.Println("Successful POST to create paper")
-		return GeneralResponse{Message: "Paper created successfully"}, nil
-	}
-}
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return GeneralResponse{Message: "Unable to create paper"}, err
+// 	} else {
+// 		fmt.Println("Successful POST to create paper")
+// 		return GeneralResponse{Message: "Paper created successfully"}, nil
+// 	}
+// }
 
-func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+// func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
+// 	// if !ValidToken(authToken) {
+// 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+// 	// }
 
-	var p Paper
-	err := json.NewDecoder(body).Decode(&p)
+// 	var p Paper
+// 	err := json.NewDecoder(body).Decode(&p)
 
-	fmt.Println(p)
+// 	fmt.Println(p)
 
-	queryString := `
-		UPDATE papers
-		SET 
-			title = $2,
-			study_id = $3,
-			device_id = $4,
-			initial_request_evaluated = $5,
-			manuscript_drafted = $6,
-			int_ext_erp = $7,
-			updated_at = CURRENT_TIMESTAMP
-		WHERE id = $1
-	`
-	_, err = database.DB.Exec(queryString,
-		id,
-		p.Title,
-		p.Study_Id,
-		p.Device_Id,
-		p.InitialRequestEvaluated,
-		p.ManuscriptDrafted,
-		p.IntExtErp,
-	)
+// 	queryString := `
+// 		UPDATE papers
+// 		SET 
+// 			title = $2,
+// 			study_id = $3,
+// 			device_id = $4,
+// 			initial_request_evaluated = $5,
+// 			manuscript_drafted = $6,
+// 			int_ext_erp = $7,
+// 			updated_at = CURRENT_TIMESTAMP
+// 		WHERE id = $1
+// 	`
+// 	_, err = database.DB.Exec(queryString,
+// 		id,
+// 		p.Title,
+// 		p.Study_Id,
+// 		p.Device_Id,
+// 		p.InitialRequestEvaluated,
+// 		p.ManuscriptDrafted,
+// 		p.IntExtErp,
+// 	)
 
-	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: "Unable to update paper"}, err
-	} else {
-		fmt.Println("Successful PUT/PATCH to update paper")
-		return GeneralResponse{Message: "Paper updated successfully"}, nil
-	}
-}
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return GeneralResponse{Message: "Unable to update paper"}, err
+// 	} else {
+// 		fmt.Println("Successful PUT/PATCH to update paper")
+// 		return GeneralResponse{Message: "Paper updated successfully"}, nil
+// 	}
+// }
 
-func DeletePaper(id int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
-	queryString := `DELETE FROM papers WHERE id=$1`
-	res, err := database.DB.Exec(queryString, id)
-	rowCount, err := res.RowsAffected()
+// func DeletePaper(id int, authToken string) (GeneralResponse, error) {
+// 	// if !ValidToken(authToken) {
+// 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+// 	// }
+// 	queryString := `DELETE FROM papers WHERE id=$1`
+// 	res, err := database.DB.Exec(queryString, id)
+// 	rowCount, err := res.RowsAffected()
 
-	if rowCount == 0 {
-		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
-		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
-	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
-	}
-	return GeneralResponse{Message: "Paper deleted successfully"}, nil
-}
+// 	if rowCount == 0 {
+// 		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
+// 		err = errors.New("Did not find row with specified ID")
+// 		return GeneralResponse{Message: errorMessage}, err
+// 	} else if err != nil {
+// 		return GeneralResponse{Message: "Error with DELETE request"}, err
+// 	}
+// 	return GeneralResponse{Message: "Paper deleted successfully"}, nil
+// }
