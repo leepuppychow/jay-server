@@ -270,46 +270,56 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 	}
 }
 
-// func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
-// 	// if !ValidToken(authToken) {
-// 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-// 	// }
+func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
 
-// 	var p Paper
-// 	err := json.NewDecoder(body).Decode(&p)
+	var p Paper
+	err := json.NewDecoder(body).Decode(&p)
 
-// 	fmt.Println(p)
+	fmt.Println(p)
 
-// 	queryString := `
-// 		UPDATE papers
-// 		SET
-// 			title = $2,
-// 			study_id = $3,
-// 			device_id = $4,
-// 			initial_request_evaluated = $5,
-// 			manuscript_drafted = $6,
-// 			int_ext_erp = $7,
-// 			updated_at = CURRENT_TIMESTAMP
-// 		WHERE id = $1
-// 	`
-// 	_, err = database.DB.Exec(queryString,
-// 		id,
-// 		p.Title,
-// 		p.Study_Id,
-// 		p.Device_Id,
-// 		p.InitialRequestEvaluated,
-// 		p.ManuscriptDrafted,
-// 		p.IntExtErp,
-// 	)
+	queryString := `
+		UPDATE papers
+		SET
+			title = $2,
+			study_id = $3,
+			journal_id = $4,
+			initial_request_evaluated = $5,
+			manuscript_drafted = $6,
+			manuscript_submitted = $7,
+			manuscript_accepted = $8,
+			manuscript_epub = $9,
+			manuscript_printed = $10,
+			submission_attempts = $11,
+			int_ext_erp = $12,
+			updated_at = CURRENT_TIMESTAMP
+		WHERE id = $1
+	`
+	_, err = database.DB.Exec(queryString,
+		id,
+		p.Title,
+		p.Study_Id,
+		p.Journal_Id,
+		p.InitialRequestEvaluated,
+		p.ManuscriptDrafted,
+		p.ManuscriptSubmitted,
+		p.ManuscriptAccepted,
+		p.ManuscriptEpub,
+		p.ManuscriptPrinted,
+		p.SubmissionAttempts,
+		p.IntExtErp,
+	)
 
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return GeneralResponse{Message: "Unable to update paper"}, err
-// 	} else {
-// 		fmt.Println("Successful PUT/PATCH to update paper")
-// 		return GeneralResponse{Message: "Paper updated successfully"}, nil
-// 	}
-// }
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: "Unable to update paper"}, err
+	} else {
+		fmt.Println("Successful PUT/PATCH to update paper")
+		return GeneralResponse{Message: "Paper updated successfully"}, nil
+	}
+}
 
 func DeletePaper(id int, authToken string) (GeneralResponse, error) {
 	// if !ValidToken(authToken) {

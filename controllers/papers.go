@@ -25,12 +25,12 @@ func CreatePaper(w http.ResponseWriter, r *http.Request) {
 	WriteResponse(data, err, 422, w)
 }
 
-// func UpdatePaper(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id, _ := strconv.Atoi(vars["id"])
-// 	data, err := models.UpdatePaper(id, r.Body, r.Header.Get("Authorization"))
-// 	WriteResponse(data, err, 422, w)
-// }
+func UpdatePaper(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	data, err := models.UpdatePaper(id, r.Body, r.Header.Get("Authorization"))
+	WriteResponse(data, err, 422, w)
+}
 
 func DeletePaper(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
