@@ -35,9 +35,9 @@ type Paper struct {
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
-	// if !ValidToken(authToken) {
-	// 	return papers, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Paper{}, errors.New("Unauthorized")
+	}
 	var papers []Paper
 	var (
 		id                        int
@@ -132,9 +132,9 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 }
 
 func FindPaper(paperId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return papers, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return Paper{}, errors.New("Unauthorized")
+	}
 	var (
 		id                        int
 		title                     string
@@ -219,10 +219,9 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 }
 
 func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
-	fmt.Println("CREATE PAPER MODEL ACTION")
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 
@@ -271,15 +270,11 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 }
 
 func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
-
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
-
-	fmt.Println(p)
-
 	queryString := `
 		UPDATE papers
 		SET
@@ -322,13 +317,12 @@ func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, err
 }
 
 func DeletePaper(id int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	queryString := `DELETE FROM papers WHERE id=$1`
 	res, err := database.DB.Exec(queryString, id)
 	rowCount, err := res.RowsAffected()
-
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
 		err = errors.New("Did not find row with specified ID")
