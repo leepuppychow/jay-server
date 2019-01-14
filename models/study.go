@@ -111,3 +111,27 @@ func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
 		return GeneralResponse{Message: "Study created successfully"}, nil
 	}
 }
+
+func UpdateStudy(studyId int, body io.Reader, authToken string) (interface{}, error) {
+	// if !ValidToken(authToken) {
+	// 	return []Study{}, errors.New("Unauthorized")
+	// }
+	var s Study
+	err := json.NewDecoder(body).Decode(&s)
+	query := `
+		UPDATE studies
+		SET 
+			name = $2,
+			updated_at = CURRENT_TIMESTAMP
+		WHERE
+			studies.id = $1
+	`
+	_, err = database.DB.Exec(query, studyId, s.Name)
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: err.Error()}, err
+	} else {
+		fmt.Println("Successful PUT/PATCH to update paper")
+		return GeneralResponse{Message: "Paper updated successfully"}, nil
+	}
+}

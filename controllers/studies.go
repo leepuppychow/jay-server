@@ -25,12 +25,12 @@ func CreateStudy(w http.ResponseWriter, r *http.Request) {
 	WriteResponse(data, err, 422, w)
 }
 
-// func UpdateStudy(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id, _ := strconv.Atoi(vars["id"])
-// 	data, err := models.UpdateStudy(id, r.Body, r.Header.Get("Authorization"))
-// 	WriteResponse(data, err, 422, w)
-// }
+func UpdateStudy(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	data, err := models.UpdateStudy(id, r.Body, r.Header.Get("Authorization"))
+	WriteResponse(data, err, 422, w)
+}
 
 // func DeleteStudy(w http.ResponseWriter, r *http.Request) {
 // 	vars := mux.Vars(r)
