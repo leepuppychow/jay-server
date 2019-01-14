@@ -1,7 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -85,4 +87,27 @@ func FindStudy(studyId int, authToken string) (interface{}, error) {
 	}
 	fmt.Println("Successful GET to find study: ", id)
 	return study, nil
+}
+
+func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
+	// if !ValidToken(authToken) {
+	// 	return []Study{}, errors.New("Unauthorized")
+	// }
+	var s Study
+	err := json.NewDecoder(body).Decode(&s)
+	if err != nil {
+		return GeneralResponse{Message: err.Error()}, err
+	}
+	query := `
+		INSERT INTO studies (name, created_at, updated_at)
+		VALUES ($1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	`
+	_, err = database.DB.Exec(query, s.Name)
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: err.Error()}, err
+	} else {
+		fmt.Println("Successful POST to create study")
+		return GeneralResponse{Message: "Study created successfully"}, nil
+	}
 }

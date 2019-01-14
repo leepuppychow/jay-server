@@ -20,10 +20,10 @@ func StudyShow(w http.ResponseWriter, r *http.Request) {
 	WriteResponse(data, err, 400, w)
 }
 
-// func CreateStudy(w http.ResponseWriter, r *http.Request) {
-// 	data, err := models.CreateStudy(r.Body, r.Header.Get("Authorization"))
-// 	WriteResponse(data, err, 422, w)
-// }
+func CreateStudy(w http.ResponseWriter, r *http.Request) {
+	data, err := models.CreateStudy(r.Body, r.Header.Get("Authorization"))
+	WriteResponse(data, err, 422, w)
+}
 
 // func UpdateStudy(w http.ResponseWriter, r *http.Request) {
 // 	vars := mux.Vars(r)
