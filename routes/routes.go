@@ -33,7 +33,7 @@ var routes = Routes{
 	{"CreateStudy", "POST", "/api/v1/studies", controllers.CreateStudy},
 	{"UpdateStudy", "PATCH", "/api/v1/studies/{id}", controllers.UpdateStudy},
 	{"UpdateStudy", "PUT", "/api/v1/studies/{id}", controllers.UpdateStudy},
-	// {"DeleteStudy", "DELETE", "/api/v1/studies/{id}", controllers.DeleteStudy},
+	{"DeleteStudy", "DELETE", "/api/v1/studies/{id}", controllers.DeleteStudy},
 	// Authors endpoints
 	{"AuthorsIndex", "POST", "/api/v1/authors", controllers.AuthorsIndex},
 	{"CreateAuthor", "POST", "/api/v1/authors", controllers.CreateAuthor},

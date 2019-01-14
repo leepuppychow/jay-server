@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -112,7 +113,7 @@ func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateStudy(studyId int, body io.Reader, authToken string) (interface{}, error) {
+func UpdateStudy(studyId int, body io.Reader, authToken string) (GeneralResponse, error) {
 	// if !ValidToken(authToken) {
 	// 	return []Study{}, errors.New("Unauthorized")
 	// }
@@ -134,4 +135,21 @@ func UpdateStudy(studyId int, body io.Reader, authToken string) (interface{}, er
 		fmt.Println("Successful PUT/PATCH to update paper")
 		return GeneralResponse{Message: "Paper updated successfully"}, nil
 	}
+}
+
+func DeleteStudy(studyId int, authToken string) (GeneralResponse, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
+	query := `DELETE FROM studies WHERE id=$1`
+	res, err := database.DB.Exec(query, studyId)
+	rowCount, err := res.RowsAffected()
+	if rowCount == 0 {
+		errorMessage := fmt.Sprintf("Error when trying to delete study with id %d", studyId)
+		err = errors.New("Did not find row with specified ID")
+		return GeneralResponse{Message: errorMessage}, err
+	} else if err != nil {
+		return GeneralResponse{Message: "Error with DELETE request"}, err
+	}
+	return GeneralResponse{Message: "Study deleted successfully"}, nil
 }

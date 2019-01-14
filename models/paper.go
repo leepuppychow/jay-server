@@ -324,7 +324,7 @@ func DeletePaper(id int, authToken string) (GeneralResponse, error) {
 	res, err := database.DB.Exec(queryString, id)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
-		errorMessage := fmt.Sprintf("Error when trying to delete Word with id %d", id)
+		errorMessage := fmt.Sprintf("Error when trying to delete study with id %d", id)
 		err = errors.New("Did not find row with specified ID")
 		return GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
