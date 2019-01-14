@@ -34,6 +34,13 @@ var routes = Routes{
 	{"UpdateStudy", "PATCH", "/api/v1/studies/{id}", controllers.UpdateStudy},
 	{"UpdateStudy", "PUT", "/api/v1/studies/{id}", controllers.UpdateStudy},
 	{"DeleteStudy", "DELETE", "/api/v1/studies/{id}", controllers.DeleteStudy},
+	// Journals endpoints
+	{"JournalsIndex", "GET", "/api/v1/journals", controllers.JournalsIndex},
+	{"JournalShow", "GET", "/api/v1/journals/{id}", controllers.JournalShow},
+	{"CreateJournal", "POST", "/api/v1/journals", controllers.CreateJournal},
+	{"UpdateJournal", "PATCH", "/api/v1/journals/{id}", controllers.UpdateJournal},
+	{"UpdateJournal", "PUT", "/api/v1/journals/{id}", controllers.UpdateJournal},
+	{"DeleteJournal", "DELETE", "/api/v1/journals/{id}", controllers.DeleteJournal},
 	// Authors endpoints
 	{"AuthorsIndex", "POST", "/api/v1/authors", controllers.AuthorsIndex},
 	{"CreateAuthor", "POST", "/api/v1/authors", controllers.CreateAuthor},

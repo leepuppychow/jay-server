@@ -10,25 +10,25 @@ import (
 	"github.com/leepuppychow/jay_medtronic/database"
 )
 
-type Study struct {
+type Journal struct {
 	Id        int    `json:"id"`
 	Name      string `json:"name"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
 
-func GetAllStudies(authToken string) ([]Study, error) {
+func GetAllJournals(authToken string) ([]Journal, error) {
 	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
+	// 	return []Journal{}, errors.New("Unauthorized")
 	// }
-	var studies []Study
+	var journals []Journal
 	var (
 		id         int
 		name       string
 		created_at time.Time
 		updated_at time.Time
 	)
-	query := `SELECT studies.* FROM studies;`
+	query := `SELECT journals.* FROM journals;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -44,24 +44,24 @@ func GetAllStudies(authToken string) ([]Study, error) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		study := Study{
+		journal := Journal{
 			Id:        id,
 			Name:      name,
 			CreatedAt: created_at.String(),
 			UpdatedAt: updated_at.String(),
 		}
-		studies = append(studies, study)
+		journals = append(journals, journal)
 	}
 	if err != nil {
-		return []Study{}, err
+		return []Journal{}, err
 	}
-	fmt.Println("Successful GET to studies index")
-	return studies, nil
+	fmt.Println("Successful GET to journals index")
+	return journals, nil
 }
 
-func FindStudy(studyId int, authToken string) (interface{}, error) {
+func FindJournal(journalId int, authToken string) (interface{}, error) {
 	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
+	// 	return []Journal{}, errors.New("Unauthorized")
 	// }
 	var (
 		id         int
@@ -69,8 +69,8 @@ func FindStudy(studyId int, authToken string) (interface{}, error) {
 		created_at time.Time
 		updated_at time.Time
 	)
-	query := `SELECT * FROM studies WHERE studies.id = $1`
-	err := database.DB.QueryRow(query, studyId).Scan(
+	query := `SELECT * FROM journals WHERE journals.id = $1`
+	err := database.DB.QueryRow(query, journalId).Scan(
 		&id,
 		&name,
 		&created_at,
@@ -80,76 +80,76 @@ func FindStudy(studyId int, authToken string) (interface{}, error) {
 		fmt.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
-	study := Study{
+	journal := Journal{
 		Id:        id,
 		Name:      name,
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find study: ", id)
-	return study, nil
+	fmt.Println("Successful GET to find journal: ", id)
+	return journal, nil
 }
 
-func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
+func CreateJournal(body io.Reader, authToken string) (interface{}, error) {
 	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
+	// 	return []Journal{}, errors.New("Unauthorized")
 	// }
-	var s Study
-	err := json.NewDecoder(body).Decode(&s)
+	var j Journal
+	err := json.NewDecoder(body).Decode(&j)
 	if err != nil {
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
-		INSERT INTO studies (name, created_at, updated_at)
+		INSERT INTO journals (name, created_at, updated_at)
 		VALUES ($1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 	`
-	_, err = database.DB.Exec(query, s.Name)
+	_, err = database.DB.Exec(query, j.Name)
 	if err != nil {
 		fmt.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create study")
-		return GeneralResponse{Message: "Study created successfully"}, nil
+		fmt.Println("Successful POST to create journal")
+		return GeneralResponse{Message: "journal created successfully"}, nil
 	}
 }
 
-func UpdateStudy(studyId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateJournal(journalId int, body io.Reader, authToken string) (GeneralResponse, error) {
 	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
+	// 	return []Journal{}, errors.New("Unauthorized")
 	// }
-	var s Study
-	err := json.NewDecoder(body).Decode(&s)
+	var j Journal
+	err := json.NewDecoder(body).Decode(&j)
 	query := `
-		UPDATE studies
+		UPDATE journals
 		SET 
 			name = $2,
 			updated_at = CURRENT_TIMESTAMP
 		WHERE
-			studies.id = $1
+			journals.id = $1
 	`
-	_, err = database.DB.Exec(query, studyId, s.Name)
+	_, err = database.DB.Exec(query, journalId, j.Name)
 	if err != nil {
 		fmt.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update study")
-		return GeneralResponse{Message: "Study updated successfully"}, nil
+		fmt.Println("Successful PUT/PATCH to update journal")
+		return GeneralResponse{Message: "Journal updated successfully"}, nil
 	}
 }
 
-func DeleteStudy(studyId int, authToken string) (GeneralResponse, error) {
+func DeleteJournal(journalId int, authToken string) (GeneralResponse, error) {
 	// if !ValidToken(authToken) {
 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
 	// }
-	query := `DELETE FROM studies WHERE id=$1`
-	res, err := database.DB.Exec(query, studyId)
+	query := `DELETE FROM journals WHERE id=$1`
+	res, err := database.DB.Exec(query, journalId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
-		errorMessage := fmt.Sprintf("Error when trying to delete study with id %d", studyId)
+		errorMessage := fmt.Sprintf("Error when trying to delete journal with id %d", journalId)
 		err = errors.New("Did not find row with specified ID")
 		return GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
 		return GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "Study deleted successfully"}, nil
+	return GeneralResponse{Message: "Journal deleted successfully"}, nil
 }
