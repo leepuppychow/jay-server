@@ -29,7 +29,7 @@ var routes = Routes{
 	{"DeletePaper", "DELETE", "/api/v1/papers/{id}", controllers.DeletePaper},
 	// Studies endpoints
 	{"StudiesIndex", "GET", "/api/v1/studies", controllers.StudiesIndex},
-	// {"StudyShow", "GET", "/api/v1/studies/{id}", controllers.StudiesShow},
+	{"StudyShow", "GET", "/api/v1/studies/{id}", controllers.StudyShow},
 	// {"CreateStudy", "POST", "/api/v1/studies", controllers.CreateStudy},
 	// {"UpdateStudy", "PATCH", "/api/v1/studies/{id}", controllers.UpdateStudy},
 	// {"UpdateStudy", "PUT", "/api/v1/studies/{id}", controllers.UpdateStudy},

@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"net/http"
-	_ "strconv"
+	"strconv"
 
-	_ "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"github.com/leepuppychow/jay_medtronic/models"
 )
 
@@ -13,12 +13,12 @@ func StudiesIndex(w http.ResponseWriter, r *http.Request) {
 	WriteResponse(data, err, 400, w)
 }
 
-// func StudyShow(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id, _ := strconv.Atoi(vars["id"])
-// 	data, err := models.FindStudy(id, r.Header.Get("Authorization"))
-// 	WriteResponse(data, err, 400, w)
-// }
+func StudyShow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	data, err := models.FindStudy(id, r.Header.Get("Authorization"))
+	WriteResponse(data, err, 400, w)
+}
 
 // func CreateStudy(w http.ResponseWriter, r *http.Request) {
 // 	data, err := models.CreateStudy(r.Body, r.Header.Get("Authorization"))
