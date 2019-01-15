@@ -70,6 +70,27 @@ var routes = Routes{
 	{"UpdateDataRequestForm", "PATCH", "/api/v1/data_request_forms/{id}", controllers.UpdateDataRequestForm},
 	{"UpdateDataRequestForm", "PUT", "/api/v1/data_request_forms/{id}", controllers.UpdateDataRequestForm},
 	{"DeleteDataRequestForm", "DELETE", "/api/v1/data_request_forms/{id}", controllers.DeleteDataRequestForm},
+	// Figure_papers endpoints
+	{"FigurePapersIndex", "GET", "/api/v1/figure_papers", controllers.FigurePapersIndex},
+	{"FigurePaperShow", "GET", "/api/v1/figure_papers/{id}", controllers.FigurePaperShow},
+	{"CreateFigurePaper", "POST", "/api/v1/figure_papers", controllers.CreateFigurePaper},
+	{"UpdateFigurePaper", "PATCH", "/api/v1/figure_papers/{id}", controllers.UpdateFigurePaper},
+	{"UpdateFigurePaper", "PUT", "/api/v1/figure_papers/{id}", controllers.UpdateFigurePaper},
+	{"DeleteFigurePaper", "DELETE", "/api/v1/figure_papers/{id}", controllers.DeleteFigurePaper},
+	// Author_papers endpoints
+	{"AuthorPapersIndex", "GET", "/api/v1/author_papers", controllers.AuthorPapersIndex},
+	{"AuthorPaperShow", "GET", "/api/v1/author_papers/{id}", controllers.AuthorPaperShow},
+	{"CreateAuthorPaper", "POST", "/api/v1/author_papers", controllers.CreateAuthorPaper},
+	{"UpdateAuthorPaper", "PATCH", "/api/v1/author_papers/{id}", controllers.UpdateAuthorPaper},
+	{"UpdateAuthorPaper", "PUT", "/api/v1/author_papers/{id}", controllers.UpdateAuthorPaper},
+	{"DeleteAuthorPaper", "DELETE", "/api/v1/author_papers/{id}", controllers.DeleteAuthorPaper},
+	// Device_papers endpoints
+	{"DevicePapersIndex", "GET", "/api/v1/device_papers", controllers.DevicePapersIndex},
+	{"DevicePaperShow", "GET", "/api/v1/device_papers/{id}", controllers.DevicePaperShow},
+	{"CreateDevicePaper", "POST", "/api/v1/device_papers", controllers.CreateDevicePaper},
+	{"UpdateDevicePaper", "PATCH", "/api/v1/device_papers/{id}", controllers.UpdateDevicePaper},
+	{"UpdateDevicePaper", "PUT", "/api/v1/device_papers/{id}", controllers.UpdateDevicePaper},
+	{"DeleteDevicePaper", "DELETE", "/api/v1/device_papers/{id}", controllers.DeleteDevicePaper},
 }
 
 func NewRouter() *mux.Router {
