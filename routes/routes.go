@@ -17,6 +17,7 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
+	// User endpoints
 	{"CheckToken", "GET", "/api/v1/checktoken", controllers.CheckToken},
 	{"CreateUser", "POST", "/api/v1/users", controllers.CreateUser},
 	{"Login", "POST", "/api/v1/login", controllers.LoginUser},
@@ -55,6 +56,13 @@ var routes = Routes{
 	{"UpdateDevice", "PATCH", "/api/v1/devices/{id}", controllers.UpdateDevice},
 	{"UpdateDevice", "PUT", "/api/v1/devices/{id}", controllers.UpdateDevice},
 	{"DeleteDevice", "DELETE", "/api/v1/devices/{id}", controllers.DeleteDevice},
+	// Figures endpoints
+	{"FiguresIndex", "GET", "/api/v1/figures", controllers.FiguresIndex},
+	{"FigureShow", "GET", "/api/v1/figures/{id}", controllers.FigureShow},
+	{"CreateFigure", "POST", "/api/v1/figures", controllers.CreateFigure},
+	{"UpdateFigure", "PATCH", "/api/v1/figures/{id}", controllers.UpdateFigure},
+	{"UpdateFigure", "PUT", "/api/v1/figures/{id}", controllers.UpdateFigure},
+	{"DeleteFigure", "DELETE", "/api/v1/figures/{id}", controllers.DeleteFigure},
 }
 
 func NewRouter() *mux.Router {
