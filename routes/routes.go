@@ -77,6 +77,13 @@ var routes = Routes{
 	{"UpdateFigurePaper", "PATCH", "/api/v1/figure_papers/{id}", controllers.UpdateFigurePaper},
 	{"UpdateFigurePaper", "PUT", "/api/v1/figure_papers/{id}", controllers.UpdateFigurePaper},
 	{"DeleteFigurePaper", "DELETE", "/api/v1/figure_papers/{id}", controllers.DeleteFigurePaper},
+	// Author_papers endpoints
+	{"AuthorPapersIndex", "GET", "/api/v1/author_papers", controllers.AuthorPapersIndex},
+	{"AuthorPaperShow", "GET", "/api/v1/author_papers/{id}", controllers.AuthorPaperShow},
+	{"CreateAuthorPaper", "POST", "/api/v1/author_papers", controllers.CreateAuthorPaper},
+	{"UpdateAuthorPaper", "PATCH", "/api/v1/author_papers/{id}", controllers.UpdateAuthorPaper},
+	{"UpdateAuthorPaper", "PUT", "/api/v1/author_papers/{id}", controllers.UpdateAuthorPaper},
+	{"DeleteAuthorPaper", "DELETE", "/api/v1/author_papers/{id}", controllers.DeleteAuthorPaper},
 }
 
 func NewRouter() *mux.Router {
