@@ -63,6 +63,13 @@ var routes = Routes{
 	{"UpdateFigure", "PATCH", "/api/v1/figures/{id}", controllers.UpdateFigure},
 	{"UpdateFigure", "PUT", "/api/v1/figures/{id}", controllers.UpdateFigure},
 	{"DeleteFigure", "DELETE", "/api/v1/figures/{id}", controllers.DeleteFigure},
+	// Data request forms endpoints
+	{"DataRequestFormsIndex", "GET", "/api/v1/data_request_forms", controllers.DataRequestFormsIndex},
+	{"DataRequestFormShow", "GET", "/api/v1/data_request_forms/{id}", controllers.DataRequestFormShow},
+	{"CreateDataRequestForm", "POST", "/api/v1/data_request_forms", controllers.CreateDataRequestForm},
+	{"UpdateDataRequestForm", "PATCH", "/api/v1/data_request_forms/{id}", controllers.UpdateDataRequestForm},
+	{"UpdateDataRequestForm", "PUT", "/api/v1/data_request_forms/{id}", controllers.UpdateDataRequestForm},
+	{"DeleteDataRequestForm", "DELETE", "/api/v1/data_request_forms/{id}", controllers.DeleteDataRequestForm},
 }
 
 func NewRouter() *mux.Router {
