@@ -34,6 +34,11 @@ type Paper struct {
 	DataRequestForms        []DataRequestForm `json:"data_request_forms"`
 }
 
+type PaperResponse struct {
+	PaperId int    `json:"paper_id"`
+	Message string `json:"message"`
+}
+
 func GetAllPapers(authToken string) ([]Paper, error) {
 	// if !ValidToken(authToken) {
 	// 	return []Paper{}, errors.New("Unauthorized")
@@ -218,7 +223,7 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	return paper, nil
 }
 
-func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
+func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
 	// if !ValidToken(authToken) {
 	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
 	// }
@@ -268,7 +273,7 @@ func CreatePaper(body io.Reader, authToken string) (GeneralResponse, error) {
 		return GeneralResponse{Message: "Unable to create paper"}, err
 	} else {
 		fmt.Println("Successful POST to create paper")
-		return GeneralResponse{Message: fmt.Sprintf("Paper with id %d created successfully", lastInsertId)}, nil
+		return PaperResponse{PaperId: lastInsertId, Message: "Paper created successfully"}, nil
 	}
 }
 
