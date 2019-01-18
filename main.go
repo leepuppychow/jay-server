@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	_ "github.com/leepuppychow/jay_medtronic/database"
 	"github.com/leepuppychow/jay_medtronic/env"
 	"github.com/leepuppychow/jay_medtronic/routes"
-	"log"
-	"net/http"
 
 	"github.com/gorilla/handlers"
 )

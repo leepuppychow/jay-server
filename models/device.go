@@ -180,17 +180,18 @@ func GetDevicesForPaper(paperId int, kawaiiChan chan []Device) {
 			&created_at,
 			&updated_at,
 		)
+		if err != nil {
+			fmt.Println(err)
+		}
+		device := Device{
+			Id:        id,
+			Name:      name,
+			CreatedAt: created_at.String(),
+			UpdatedAt: updated_at.String(),
+		}
+		devices = append(devices, device)
 	}
-	if err != nil {
-		fmt.Println(err)
-	}
-	device := Device{
-		Id:        id,
-		Name:      name,
-		CreatedAt: created_at.String(),
-		UpdatedAt: updated_at.String(),
-	}
-	devices = append(devices, device)
+
 	if err != nil {
 		fmt.Println("Error getting paper's devices", err)
 	}
