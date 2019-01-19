@@ -97,6 +97,20 @@ func FindAuthorPaper(authorPaperId int, authToken string) (interface{}, error) {
 	return fp, nil
 }
 
+func CreateAuthorPaperQuery(ap AuthorPaper) (int, error) {
+	query := `
+		INSERT INTO author_papers (paper_id, author_id, created_at, updated_at)
+		VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		RETURNING id
+	`
+	lastInsertId := 0
+	err := database.DB.QueryRow(query, ap.PaperId, ap.AuthorId).Scan(&lastInsertId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return lastInsertId, err
+}
+
 func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
 	// if !ValidToken(authToken) {
 	// 	return []AuthorPaper{}, errors.New("Unauthorized")
@@ -106,11 +120,8 @@ func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
 	if err != nil {
 		return GeneralResponse{Message: err.Error()}, err
 	}
-	query := `
-		INSERT INTO author_papers (paper_id, author_id, created_at, updated_at)
-		VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	`
-	_, err = database.DB.Exec(query, ap.PaperId, ap.AuthorId)
+	_, err = CreateAuthorPaperQuery(ap)
+
 	if err != nil {
 		fmt.Println(err)
 		return GeneralResponse{Message: err.Error()}, err

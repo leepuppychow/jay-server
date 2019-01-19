@@ -25,6 +25,11 @@ func CreatePaper(w http.ResponseWriter, r *http.Request) {
 	WriteResponse(data, err, 422, w)
 }
 
+func SpecialCreatePaper(w http.ResponseWriter, r *http.Request) {
+	data, err := models.SpecialCreatePaper(r.Body, r.Header.Get("Authorization"))
+	WriteResponse(data, err, 422, w)
+}
+
 func UpdatePaper(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])

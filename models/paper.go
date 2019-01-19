@@ -29,7 +29,9 @@ type Paper struct {
 	Study                   string            `json:"study"`
 	Journal                 string            `json:"journal"`
 	Devices                 []Device          `json:"devices"`
+	Device_Ids              []int             `json:"device_ids"`
 	Authors                 []Author          `json:"authors"`
+	Author_Ids              []int             `json:"author_ids"`
 	Figures                 []Figure          `json:"figures"`
 	DataRequestForms        []DataRequestForm `json:"data_request_forms"`
 }
@@ -223,16 +225,7 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	return paper, nil
 }
 
-func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
-	var p Paper
-	err := json.NewDecoder(body).Decode(&p)
-
-	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
-	}
+func CreatePaperQuery(p Paper) (int, error) {
 	queryString := `
 		INSERT INTO papers (
 			title,
@@ -252,9 +245,8 @@ func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id
 	`
-
 	lastInsertId := 0
-	err = database.DB.QueryRow(queryString,
+	err := database.DB.QueryRow(queryString,
 		p.Title,
 		p.Study_Id,
 		p.Journal_Id,
@@ -268,6 +260,20 @@ func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
 		p.IntExtErp,
 	).Scan(&lastInsertId)
 
+	return lastInsertId, err
+}
+
+func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
+	var p Paper
+	err := json.NewDecoder(body).Decode(&p)
+	if err != nil {
+		return GeneralResponse{Message: err.Error()}, err
+	}
+	lastInsertId, err := CreatePaperQuery(p)
+
 	if err != nil {
 		fmt.Println(err)
 		return GeneralResponse{Message: "Unable to create paper"}, err
@@ -275,6 +281,48 @@ func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
 		fmt.Println("Successful POST to create paper")
 		return PaperResponse{PaperId: lastInsertId, Message: "Paper created successfully"}, nil
 	}
+}
+
+func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
+	// if !ValidToken(authToken) {
+	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	// }
+	var p Paper
+	err := json.NewDecoder(body).Decode(&p)
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: err.Error()}, err
+	}
+	paperId, err := CreatePaperQuery(p)
+	if err != nil {
+		fmt.Println(err)
+		return GeneralResponse{Message: err.Error()}, err
+	}
+
+	// Create the author_papers and device_papers entries now
+	for _, authorId := range p.Author_Ids {
+		ap := AuthorPaper{
+			PaperId:  paperId,
+			AuthorId: authorId,
+		}
+		_, err = CreateAuthorPaperQuery(ap)
+		if err != nil {
+			fmt.Println(err)
+			return GeneralResponse{Message: err.Error()}, err
+		}
+	}
+	for _, deviceId := range p.Device_Ids {
+		dp := DevicePaper{
+			PaperId:  paperId,
+			DeviceId: deviceId,
+		}
+		_, err = CreateDevicePaperQuery(dp)
+		if err != nil {
+			fmt.Println(err)
+			return GeneralResponse{Message: err.Error()}, err
+		}
+	}
+	return GeneralResponse{ Message: "Paper, author_papers, and device_papers created successfully"}, nil
 }
 
 func UpdatePaper(id int, body io.Reader, authToken string) (GeneralResponse, error) {
