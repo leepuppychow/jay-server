@@ -30,13 +30,12 @@ type Paper struct {
 	UpdatedAt               string       `json:"updated_at"`
 	Study                   string       `json:"study"`
 	Journal                 string       `json:"journal"`
-	Submissions             []Submission `json:"submissions"`
-	Submission_Ids          []int        `json:"submission_ids"`
 	Devices                 []Device     `json:"devices"`
 	Device_Ids              []int        `json:"device_ids"`
 	Authors                 []Author     `json:"authors"`
 	Author_Ids              []int        `json:"author_ids"`
 	Figures                 []Figure     `json:"figures"`
+	Submissions             []Submission `json:"submissions"`
 }
 
 type PaperResponse struct {
@@ -332,6 +331,7 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
+
 	for _, deviceId := range p.Device_Ids {
 		dp := DevicePaper{
 			PaperId:  paperId,
@@ -343,6 +343,8 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
+	// TODO need some different logic to add submissions for the paper & corresponding journal
+
 	return GeneralResponse{Message: "Paper, author_papers, and device_papers created successfully"}, nil
 }
 
