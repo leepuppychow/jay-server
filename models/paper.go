@@ -15,7 +15,6 @@ type Paper struct {
 	Id                      int          `json:"id"`
 	Title                   string       `json:"title"`
 	Study_Id                int          `json:"study_id"`
-	Journal_Id              int          `json:"journal_id"`
 	InitialRequestEvaluated string       `json:"initial_request_evaluated"`
 	DrfRounds               int          `json:"drf_rounds"`
 	DrfCompleted            string       `json:"drf_completed"`
@@ -54,7 +53,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		id                        int
 		title                     string
 		study_id                  int
-		journal_id                int
 		initial_request_evaluated pq.NullTime
 		drf_rounds                int
 		drf_completed             pq.NullTime
@@ -74,7 +72,8 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 	query := `
 		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
-		INNER JOIN journals ON papers.journal_id = journals.id;
+		INNER JOIN submissions ON papers.id = submissions.paper_id
+		INNER JOIN journals ON submissions.journal_id = journals.id
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -86,11 +85,10 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		err = rows.Scan(
 			&id,
 			&study_id,
-			&journal_id,
 			&title,
 			&int_ext_erp,
-			&initial_request_evaluated,
 			&drf_rounds,
+			&initial_request_evaluated,
 			&drf_completed,
 			&drf_requested_delivery,
 			&drf_actual_delivery,
@@ -121,7 +119,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			Id:                      id,
 			Title:                   title,
 			Study_Id:                study_id,
-			Journal_Id:              journal_id,
 			InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
 			DrfRounds:               drf_rounds,
 			DrfCompleted:            NullTimeCheck(drf_completed),
@@ -158,7 +155,6 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	var (
 		id                        int
 		study_id                  int
-		journal_id                int
 		title                     string
 		initial_request_evaluated pq.NullTime
 		drf_rounds                int
@@ -180,17 +176,17 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	queryString := `
 		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
-		INNER JOIN journals ON papers.journal_id = journals.id
-		WHERE papers.id=$1;
+		INNER JOIN submissions ON papers.id = submissions.paper_id
+		INNER JOIN journals ON submissions.journal_id = journals.id
+		WHERE papers.id=$1
 	`
 	err := database.DB.QueryRow(queryString, paperId).Scan(
 		&id,
 		&study_id,
-		&journal_id,
 		&title,
 		&int_ext_erp,
-		&initial_request_evaluated,
 		&drf_rounds,
+		&initial_request_evaluated,
 		&drf_completed,
 		&drf_requested_delivery,
 		&drf_actual_delivery,
@@ -218,7 +214,6 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		Id:                      id,
 		Title:                   title,
 		Study_Id:                study_id,
-		Journal_Id:              journal_id,
 		InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
 		DrfRounds:               drf_rounds,
 		DrfCompleted:            NullTimeCheck(drf_completed),
@@ -252,7 +247,6 @@ func CreatePaperQuery(p Paper) (int, error) {
 		INSERT INTO papers (
 			title,
 			study_id,
-			journal_id, 
 			initial_request_evaluated,
 			drf_rounds,
 			drf_completed,
@@ -267,14 +261,13 @@ func CreatePaperQuery(p Paper) (int, error) {
 			created_at,
 			updated_at
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 		RETURNING id
 	`
 	lastInsertId := 0
 	err := database.DB.QueryRow(queryString,
 		p.Title,
 		p.Study_Id,
-		p.Journal_Id,
 		p.InitialRequestEvaluated,
 		p.DrfRounds,
 		p.DrfCompleted,
@@ -364,18 +357,17 @@ func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse
 		SET
 			title = $2,
 			study_id = $3,
-			journal_id = $4,
-			initial_request_evaluated = $5,
-			drf_rounds = $6,
-			drf_completed = $7,
-			drf_requested_delivery = $8,
-			drf_actual_delivery = $9,
-			data_refinement_complete = $10,
-			manuscript_drafted = $11,
-			manuscript_accepted = $12,
-			manuscript_epub = $13,
-			manuscript_printed = $14,
-			int_ext_erp = $15,
+			initial_request_evaluated = $4,
+			drf_rounds = $5,
+			drf_completed = $6,
+			drf_requested_delivery = $7,
+			drf_actual_delivery = $8,
+			data_refinement_complete = $9,
+			manuscript_drafted = $10,
+			manuscript_accepted = $11,
+			manuscript_epub = $12,
+			manuscript_printed = $13,
+			int_ext_erp = $14,
 			updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
@@ -383,7 +375,6 @@ func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse
 		paperId,
 		p.Title,
 		p.Study_Id,
-		p.Journal_Id,
 		p.InitialRequestEvaluated,
 		p.DrfRounds,
 		p.DrfCompleted,
