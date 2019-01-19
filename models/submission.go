@@ -147,8 +147,8 @@ func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error)
 		s.PaperId,
 		s.JournalId,
 		s.Attempt,
-		s.ManuscriptSubmitted,
-		s.ManuscriptRejected,
+		InvalidTimeWillBeNull(s.ManuscriptSubmitted),
+		InvalidTimeWillBeNull(s.ManuscriptRejected),
 	).Scan(&lastInsertId)
 
 	if err != nil {

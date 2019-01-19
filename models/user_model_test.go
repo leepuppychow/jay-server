@@ -1,15 +1,13 @@
-package models_test
+package models
 
 import (
 	"fmt"
 	"testing"
-
-	"github.com/leepuppychow/jay_medtronic/models"
 )
 
 func TestCreateToken(t *testing.T) {
 	email := "test@test.com"
-	token := models.CreateToken(email)
+	token := CreateToken(email)
 	fmt.Println(token)
 	if token == "" {
 		t.Errorf("CreateToken test failed")
@@ -18,9 +16,9 @@ func TestCreateToken(t *testing.T) {
 
 func TestValidToken(t *testing.T) {
 	email := "test@test.com"
-	token := models.CreateToken(email)
+	token := CreateToken(email)
 
-	valid := models.ValidToken(token)
+	valid := ValidToken(token)
 	if !valid {
 		t.Errorf("ValidToken test failed")
 	}
@@ -28,8 +26,8 @@ func TestValidToken(t *testing.T) {
 
 func TestValidatePassword(t *testing.T) {
 	pw := "hello"
-	hashedPW := models.HashPassword(pw)
-	valid, err := models.ValidatePassword(hashedPW, pw)
+	hashedPW := HashPassword(pw)
+	valid, err := ValidatePassword(hashedPW, pw)
 
 	if !valid || err != nil {
 		t.Errorf("Validate Password failed")
