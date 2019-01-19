@@ -212,49 +212,57 @@ func DeleteSubmission(submissionId int, authToken string) (GeneralResponse, erro
 	return GeneralResponse{Message: "Submission deleted successfully"}, nil
 }
 
-// func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
-// 	var Submissions []Submission
-// 	var (
-// 		id         int
-// 		first_name string
-// 		last_name  string
-// 		created_at time.Time
-// 		updated_at time.Time
-// 	)
-// 	query := `
-// 		SELECT Submissions.* FROM Submissions 
-// 		INNER JOIN Submission_papers ON Submissions.id = Submission_papers.Submission_id
-// 		INNER JOIN papers ON papers.id = Submission_papers.paper_id
-// 		WHERE papers.id = $1
-// 	`
-// 	rows, err := database.DB.Query(query, paperId)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-// 	defer rows.Close()
-// 	for rows.Next() {
-// 		err = rows.Scan(
-// 			&id,
-// 			&first_name,
-// 			&last_name,
-// 			&created_at,
-// 			&updated_at,
-// 		)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 		}
-// 		Submission := Submission{
-// 			Id:        id,
-// 			FirstName: first_name,
-// 			LastName:  last_name,
-// 			CreatedAt: created_at.String(),
-// 			UpdatedAt: updated_at.String(),
-// 		}
-// 		Submissions = append(Submissions, Submission)
-// 	}
+func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
+	var submissions []Submission
+	var (
+		id                   int
+		paper_id             int
+		journal_id           int
+		attempt              int
+		manuscript_submitted pq.NullTime
+		manuscript_rejected  pq.NullTime
+		created_at           time.Time
+		updated_at           time.Time
+	)
+	query := `
+		SELECT submissions.* FROM submissions 
+		INNER JOIN papers ON papers.id = submissions.paper_id
+		WHERE papers.id = $1
+	`
+	rows, err := database.DB.Query(query, paperId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(
+			&id,
+			&paper_id,
+			&journal_id,
+			&attempt,
+			&manuscript_submitted,
+			&manuscript_rejected,
+			&created_at,
+			&updated_at,
+		)
+		if err != nil {
+			fmt.Println(err)
+		}
+		s := Submission{
+			Id:                  id,
+			PaperId:             paper_id,
+			JournalId:           journal_id,
+			Attempt:             attempt,
+			ManuscriptSubmitted: NullTimeCheck(manuscript_submitted),
+			ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
+			CreatedAt:           created_at.String(),
+			UpdatedAt:           updated_at.String(),
+		}
+		submissions = append(submissions, s)
+	}
 
-// 	if err != nil {
-// 		fmt.Println("Error getting paper's Submissions", err)
-// 	}
-// 	kawaiiChan <- Submissions
-// }
+	if err != nil {
+		fmt.Println("Error getting paper's Submissions", err)
+	}
+	kawaiiChan <- submissions
+}

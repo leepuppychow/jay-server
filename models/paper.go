@@ -111,9 +111,11 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		authorsChannel := make(chan []Author)
 		figuresChannel := make(chan []Figure)
 		devicesChannel := make(chan []Device)
+		submissionsChannel := make(chan []Submission)
 		go GetAuthorsForPaper(id, authorsChannel)
 		go GetFiguresForPaper(id, figuresChannel)
 		go GetDevicesForPaper(id, devicesChannel)
+		go GetSubmissionsForPaper(id, submissionsChannel)
 
 		paper := Paper{
 			Id:                      id,
@@ -138,6 +140,7 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			Authors:                 <-authorsChannel,
 			Figures:                 <-figuresChannel,
 			Devices:                 <-devicesChannel,
+			Submissions:             <-submissionsChannel,
 		}
 		papers = append(papers, paper)
 	}
@@ -205,9 +208,11 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 	authorsChannel := make(chan []Author)
 	figuresChannel := make(chan []Figure)
 	devicesChannel := make(chan []Device)
+	submissionsChannel := make(chan []Submission)
 	go GetAuthorsForPaper(id, authorsChannel)
 	go GetFiguresForPaper(id, figuresChannel)
 	go GetDevicesForPaper(id, devicesChannel)
+	go GetSubmissionsForPaper(id, submissionsChannel)
 
 	paper := Paper{
 		Id:                      id,
@@ -232,6 +237,7 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		Authors:                 <-authorsChannel,
 		Figures:                 <-figuresChannel,
 		Devices:                 <-devicesChannel,
+		Submissions:             <-submissionsChannel,
 	}
 
 	if err != nil {
