@@ -29,7 +29,6 @@ type Paper struct {
 	CreatedAt               string       `json:"created_at"`
 	UpdatedAt               string       `json:"updated_at"`
 	Study                   string       `json:"study"`
-	Journal                 string       `json:"journal"`
 	Devices                 []Device     `json:"devices"`
 	Device_Ids              []int        `json:"device_ids"`
 	Authors                 []Author     `json:"authors"`
@@ -66,13 +65,10 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		created_at                time.Time
 		updated_at                time.Time
 		study                     string
-		journal                   string
 	)
 	query := `
-		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
+		SELECT papers.*, studies.name AS study FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
-		INNER JOIN submissions ON papers.id = submissions.paper_id
-		INNER JOIN journals ON submissions.journal_id = journals.id
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -99,7 +95,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			&created_at,
 			&updated_at,
 			&study,
-			&journal,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -132,7 +127,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			CreatedAt:               created_at.String(),
 			UpdatedAt:               updated_at.String(),
 			Study:                   study,
-			Journal:                 journal,
 			Authors:                 <-authorsChannel,
 			Figures:                 <-figuresChannel,
 			Devices:                 <-devicesChannel,
@@ -169,14 +163,11 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		created_at                time.Time
 		updated_at                time.Time
 		study                     string
-		journal                   string
 	)
 
 	queryString := `
-		SELECT papers.*, studies.name AS study, journals.name AS journal FROM papers 
+		SELECT papers.*, studies.name AS study FROM papers 
 		INNER JOIN studies ON papers.study_id = studies.id
-		INNER JOIN submissions ON papers.id = submissions.paper_id
-		INNER JOIN journals ON submissions.journal_id = journals.id
 		WHERE papers.id=$1
 	`
 	err := database.DB.QueryRow(queryString, paperId).Scan(
@@ -197,7 +188,6 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		&created_at,
 		&updated_at,
 		&study,
-		&journal,
 	)
 
 	authorsChannel := make(chan []Author)
@@ -227,7 +217,6 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		CreatedAt:               created_at.String(),
 		UpdatedAt:               updated_at.String(),
 		Study:                   study,
-		Journal:                 journal,
 		Authors:                 <-authorsChannel,
 		Figures:                 <-figuresChannel,
 		Devices:                 <-devicesChannel,

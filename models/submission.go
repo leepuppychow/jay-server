@@ -16,6 +16,7 @@ type Submission struct {
 	Id                  int    `json:"id"`
 	PaperId             int    `json:"paper_id"`
 	JournalId           int    `json:"journal_id"`
+	Journal             string `json:"journal"`
 	Attempt             int    `json:"attempt"`
 	ManuscriptSubmitted string `json:"manuscript_submitted"`
 	ManuscriptRejected  string `json:"manuscript_rejected"`
@@ -37,8 +38,12 @@ func GetAllSubmissions(authToken string) ([]Submission, error) {
 		manuscript_rejected  pq.NullTime
 		created_at           time.Time
 		updated_at           time.Time
+		journal              string
 	)
-	query := `SELECT submissions.* FROM submissions;`
+	query := `
+		SELECT submissions.*, journals.name AS journal FROM submissions
+		INNER JOIN journals ON submissions.journal_id = journals.id
+	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -54,6 +59,7 @@ func GetAllSubmissions(authToken string) ([]Submission, error) {
 			&manuscript_rejected,
 			&created_at,
 			&updated_at,
+			&journal,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -67,6 +73,7 @@ func GetAllSubmissions(authToken string) ([]Submission, error) {
 			ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
 			CreatedAt:           created_at.String(),
 			UpdatedAt:           updated_at.String(),
+			Journal:             journal,
 		}
 		submissions = append(submissions, submission)
 	}
@@ -90,8 +97,13 @@ func FindSubmission(submissionId int, authToken string) (interface{}, error) {
 		manuscript_rejected  pq.NullTime
 		created_at           time.Time
 		updated_at           time.Time
+		journal              string
 	)
-	query := `SELECT * FROM submissions WHERE submissions.id = $1`
+	query := `
+		SELECT submissions.*, journals.name AS journal FROM submissions
+		INNER JOIN journals ON submissions.journal_id = journals.id
+		WHERE submissions.id = $1
+	`
 	err := database.DB.QueryRow(query, submissionId).Scan(
 		&id,
 		&paper_id,
@@ -101,6 +113,7 @@ func FindSubmission(submissionId int, authToken string) (interface{}, error) {
 		&manuscript_rejected,
 		&created_at,
 		&updated_at,
+		&journal,
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -115,6 +128,7 @@ func FindSubmission(submissionId int, authToken string) (interface{}, error) {
 		ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
 		CreatedAt:           created_at.String(),
 		UpdatedAt:           updated_at.String(),
+		Journal:             journal,
 	}
 	fmt.Println("Successful GET to find Submission: ", id)
 	return s, nil
@@ -223,10 +237,12 @@ func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
 		manuscript_rejected  pq.NullTime
 		created_at           time.Time
 		updated_at           time.Time
+		journal              string
 	)
 	query := `
-		SELECT submissions.* FROM submissions 
+		SELECT submissions.*, journals.name AS journal FROM submissions 
 		INNER JOIN papers ON papers.id = submissions.paper_id
+		INNER JOIN journals ON submissions.journal_id = journals.id
 		WHERE papers.id = $1
 	`
 	rows, err := database.DB.Query(query, paperId)
@@ -244,6 +260,7 @@ func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
 			&manuscript_rejected,
 			&created_at,
 			&updated_at,
+			&journal,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -257,6 +274,7 @@ func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
 			ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
 			CreatedAt:           created_at.String(),
 			UpdatedAt:           updated_at.String(),
+			Journal:             journal,
 		}
 		submissions = append(submissions, s)
 	}
