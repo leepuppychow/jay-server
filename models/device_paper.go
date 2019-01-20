@@ -97,6 +97,20 @@ func FindDevicePaper(devicePaperId int, authToken string) (interface{}, error) {
 	return dp, nil
 }
 
+func CreateDevicePaperQuery(dp DevicePaper) (int, error) {
+	query := `
+		INSERT INTO device_papers (paper_id, device_id, created_at, updated_at)
+		VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		RETURNING id
+	`
+	lastInsertId := 0
+	err := database.DB.QueryRow(query, dp.PaperId, dp.DeviceId).Scan(&lastInsertId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return lastInsertId, err
+}
+
 func CreateDevicePaper(body io.Reader, authToken string) (interface{}, error) {
 	// if !ValidToken(authToken) {
 	// 	return []DevicePaper{}, errors.New("Unauthorized")
@@ -106,11 +120,7 @@ func CreateDevicePaper(body io.Reader, authToken string) (interface{}, error) {
 	if err != nil {
 		return GeneralResponse{Message: err.Error()}, err
 	}
-	query := `
-		INSERT INTO device_papers (paper_id, device_id, created_at, updated_at)
-		VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	`
-	_, err = database.DB.Exec(query, dp.PaperId, dp.DeviceId)
+	_, err = CreateDevicePaperQuery(dp)
 	if err != nil {
 		fmt.Println(err)
 		return GeneralResponse{Message: err.Error()}, err

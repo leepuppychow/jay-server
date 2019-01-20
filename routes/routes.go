@@ -24,6 +24,7 @@ var routes = Routes{
 	// Papers endpoints
 	{"PapersIndex", "GET", "/api/v1/papers", controllers.PapersIndex},
 	{"CreatePaper", "POST", "/api/v1/papers", controllers.CreatePaper},
+	{"SpecialCreatePaper", "POST", "/api/v1/special_paper_create", controllers.SpecialCreatePaper},
 	{"PapersShow", "GET", "/api/v1/papers/{id}", controllers.PapersShow},
 	{"UpdatePaper", "PATCH", "/api/v1/papers/{id}", controllers.UpdatePaper},
 	{"UpdatePaper", "PUT", "/api/v1/papers/{id}", controllers.UpdatePaper},
@@ -63,13 +64,13 @@ var routes = Routes{
 	{"UpdateFigure", "PATCH", "/api/v1/figures/{id}", controllers.UpdateFigure},
 	{"UpdateFigure", "PUT", "/api/v1/figures/{id}", controllers.UpdateFigure},
 	{"DeleteFigure", "DELETE", "/api/v1/figures/{id}", controllers.DeleteFigure},
-	// Data request forms endpoints
-	{"DataRequestFormsIndex", "GET", "/api/v1/data_request_forms", controllers.DataRequestFormsIndex},
-	{"DataRequestFormShow", "GET", "/api/v1/data_request_forms/{id}", controllers.DataRequestFormShow},
-	{"CreateDataRequestForm", "POST", "/api/v1/data_request_forms", controllers.CreateDataRequestForm},
-	{"UpdateDataRequestForm", "PATCH", "/api/v1/data_request_forms/{id}", controllers.UpdateDataRequestForm},
-	{"UpdateDataRequestForm", "PUT", "/api/v1/data_request_forms/{id}", controllers.UpdateDataRequestForm},
-	{"DeleteDataRequestForm", "DELETE", "/api/v1/data_request_forms/{id}", controllers.DeleteDataRequestForm},
+	// Submissions endpoints
+	{"SubmissionsIndex", "GET", "/api/v1/submissions", controllers.SubmissionsIndex},
+	{"SubmissionShow", "GET", "/api/v1/submissions/{id}", controllers.SubmissionShow},
+	{"CreateSubmission", "POST", "/api/v1/submissions", controllers.CreateSubmission},
+	{"UpdateSubmission", "PATCH", "/api/v1/submissions/{id}", controllers.UpdateSubmission},
+	{"UpdateSubmission", "PUT", "/api/v1/submissions/{id}", controllers.UpdateSubmission},
+	{"DeleteSubmission", "DELETE", "/api/v1/submissions/{id}", controllers.DeleteSubmission},
 	// Figure_papers endpoints
 	{"FigurePapersIndex", "GET", "/api/v1/figure_papers", controllers.FigurePapersIndex},
 	{"FigurePaperShow", "GET", "/api/v1/figure_papers/{id}", controllers.FigurePaperShow},
