@@ -1,8 +1,6 @@
 FROM golang
 
 ADD . /go/src/github.com/leepuppychow/jay_medtronic
-ENV DB_CONN=""
-ENV SECRET="somesecret"
 
 RUN go get github.com/gorilla/mux
 RUN go get github.com/gorilla/handlers
