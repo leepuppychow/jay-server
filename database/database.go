@@ -15,12 +15,16 @@ func InitDB(environment string) {
 	var connection string
 	switch environment {
 	case "production":
+		fmt.Println("Using production DB")
 		connection = env.ProductionDB
 	case "development":
+		fmt.Println("Using development DB")
 		connection = env.DevelopmentDB
 	case "test":
+		fmt.Println("Using test DB")
 		connection = env.TestDB
 	default:
+		fmt.Println("Using default development DB")
 		connection = env.DevelopmentDB
 	}
 	fmt.Println("Database connection initialized")
