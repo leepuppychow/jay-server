@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/leepuppychow/jay_medtronic/env"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
