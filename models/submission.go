@@ -134,15 +134,7 @@ func FindSubmission(submissionId int, authToken string) (interface{}, error) {
 	return s, nil
 }
 
-func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Submission{}, errors.New("Unauthorized")
-	// }
-	var s Submission
-	err := json.NewDecoder(body).Decode(&s)
-	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
-	}
+func CreateSubmissionQuery(s Submission) (int, error) {
 	query := `
 		INSERT INTO submissions (
 			paper_id,
@@ -157,7 +149,7 @@ func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error)
 		RETURNING id
 	`
 	lastInsertId := 0
-	err = database.DB.QueryRow(query,
+	err := database.DB.QueryRow(query,
 		s.PaperId,
 		s.JournalId,
 		s.Attempt,
@@ -165,6 +157,19 @@ func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error)
 		InvalidTimeWillBeNull(s.ManuscriptRejected),
 	).Scan(&lastInsertId)
 
+	return lastInsertId, err
+}
+
+func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error) {
+	// if !ValidToken(authToken) {
+	// 	return []Submission{}, errors.New("Unauthorized")
+	// }
+	var s Submission
+	err := json.NewDecoder(body).Decode(&s)
+	if err != nil {
+		return GeneralResponse{Message: err.Error()}, err
+	}
+	lastInsertId, err := CreateSubmissionQuery(s)
 	if err != nil {
 		fmt.Println(err)
 		return GeneralResponse{Message: err.Error()}, err

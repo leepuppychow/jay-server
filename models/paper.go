@@ -308,7 +308,8 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 		return GeneralResponse{Message: err.Error()}, err
 	}
 
-	// Create the author_papers and device_papers entries now
+	// Now create associated resources (joins tables)
+	// TODO: refactor using channels?
 	for _, authorId := range p.Author_Ids {
 		ap := AuthorPaper{
 			PaperId:  paperId,
@@ -320,6 +321,7 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
+	fmt.Println("Author_papers created successfully")
 
 	for _, deviceId := range p.Device_Ids {
 		dp := DevicePaper{
@@ -332,9 +334,20 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	// TODO need some different logic to add submissions for the paper & corresponding journal
+	fmt.Println("Device_papers created successfully")
 
-	return GeneralResponse{Message: "Paper, author_papers, and device_papers created successfully"}, nil
+	for i, s := range p.Submissions {
+		s.PaperId = paperId
+		s.Attempt = i + 1
+		_, err = CreateSubmissionQuery(s)
+		if err != nil {
+			fmt.Println(err)
+			return GeneralResponse{Message: err.Error()}, err
+		}
+	}
+	fmt.Println("Submissions created successfully")
+
+	return GeneralResponse{Message: "Paper, author_papers, device_papers, submissions created successfully"}, nil
 }
 
 func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse, error) {
