@@ -1,0 +1,17 @@
+FROM golang
+
+ADD . /go/src/github.com/leepuppychow/jay_medtronic
+ENV DB_CONN="user=leepuppychow password=Inferiorpasswordnumber2 dbname=jay_medtronic sslmode=disable host=leepuppychow.c9xrmeiw9awf.us-west-2.rds.amazonaws.com port=5432 timezone=utc"
+ENV SECRET="whoopwhoopwoop"
+
+RUN go get github.com/gorilla/mux
+RUN go get github.com/gorilla/handlers
+RUN go get github.com/dgrijalva/jwt-go
+RUN go get github.com/lib/pq
+RUN go get github.com/raja/argon2pw
+
+RUN go install github.com/leepuppychow/jay_medtronic
+
+ENTRYPOINT /go/bin/jay_medtronic
+
+EXPOSE 3000
