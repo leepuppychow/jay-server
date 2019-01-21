@@ -113,7 +113,7 @@ func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateStudy(studyId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateStudy(studyId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Study{}, errors.New("Unauthorized")
 	}

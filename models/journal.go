@@ -113,7 +113,7 @@ func CreateJournal(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateJournal(journalId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateJournal(journalId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Journal{}, errors.New("Unauthorized")
 	}

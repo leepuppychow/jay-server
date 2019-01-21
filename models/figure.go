@@ -127,7 +127,7 @@ func CreateFigure(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateFigure(figureId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateFigure(figureId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Figure{}, errors.New("Unauthorized")
 	}

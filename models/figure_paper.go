@@ -120,7 +120,7 @@ func CreateFigurePaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateFigurePaper(figurePaperId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateFigurePaper(figurePaperId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []FigurePaper{}, errors.New("Unauthorized")
 	}

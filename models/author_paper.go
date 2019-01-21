@@ -131,7 +131,7 @@ func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateAuthorPaper(authorPaperId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateAuthorPaper(authorPaperId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []AuthorPaper{}, errors.New("Unauthorized")
 	}

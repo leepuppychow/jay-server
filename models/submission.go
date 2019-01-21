@@ -160,7 +160,7 @@ func CreateSubmissionQuery(s Submission) (int, error) {
 	return lastInsertId, err
 }
 
-func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error) {
+func CreateSubmission(body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Submission{}, errors.New("Unauthorized")
 	}
@@ -179,7 +179,7 @@ func CreateSubmission(body io.Reader, authToken string) (GeneralResponse, error)
 	}
 }
 
-func UpdateSubmission(submissionId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateSubmission(submissionId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Submission{}, errors.New("Unauthorized")
 	}

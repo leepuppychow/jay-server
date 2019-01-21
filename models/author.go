@@ -97,7 +97,7 @@ func FindAuthor(authorId int, authToken string) (interface{}, error) {
 	return author, nil
 }
 
-func CreateAuthor(body io.Reader, authToken string) (GeneralResponse, error) {
+func CreateAuthor(body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Author{}, errors.New("Unauthorized")
 	}
@@ -120,7 +120,7 @@ func CreateAuthor(body io.Reader, authToken string) (GeneralResponse, error) {
 	}
 }
 
-func UpdateAuthor(AuthorId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateAuthor(AuthorId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Author{}, errors.New("Unauthorized")
 	}

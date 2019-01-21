@@ -130,7 +130,7 @@ func CreateDevicePaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateDevicePaper(devicePaperId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateDevicePaper(devicePaperId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []DevicePaper{}, errors.New("Unauthorized")
 	}

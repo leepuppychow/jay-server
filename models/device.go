@@ -113,7 +113,7 @@ func CreateDevice(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateDevice(deviceId int, body io.Reader, authToken string) (GeneralResponse, error) {
+func UpdateDevice(deviceId int, body io.Reader, authToken string) (interface{}, error) {
 	if !ValidToken(authToken) {
 		return []Device{}, errors.New("Unauthorized")
 	}
