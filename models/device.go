@@ -18,9 +18,9 @@ type Device struct {
 }
 
 func GetAllDevices(authToken string) ([]Device, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Device{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Device{}, errors.New("Unauthorized")
+	}
 	var devices []Device
 	var (
 		id         int
@@ -60,9 +60,9 @@ func GetAllDevices(authToken string) ([]Device, error) {
 }
 
 func FindDevice(deviceId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Device{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Device{}, errors.New("Unauthorized")
+	}
 	var (
 		id         int
 		name       string
@@ -91,9 +91,9 @@ func FindDevice(deviceId int, authToken string) (interface{}, error) {
 }
 
 func CreateDevice(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Device{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Device{}, errors.New("Unauthorized")
+	}
 	var d Device
 	err := json.NewDecoder(body).Decode(&d)
 	if err != nil {
@@ -114,9 +114,9 @@ func CreateDevice(body io.Reader, authToken string) (interface{}, error) {
 }
 
 func UpdateDevice(deviceId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Device{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Device{}, errors.New("Unauthorized")
+	}
 	var d Device
 	err := json.NewDecoder(body).Decode(&d)
 	query := `
@@ -138,9 +138,9 @@ func UpdateDevice(deviceId int, body io.Reader, authToken string) (GeneralRespon
 }
 
 func DeleteDevice(deviceId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	query := `DELETE FROM devices WHERE id=$1`
 	res, err := database.DB.Exec(query, deviceId)
 	rowCount, err := res.RowsAffected()

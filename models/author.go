@@ -19,9 +19,9 @@ type Author struct {
 }
 
 func GetAllAuthors(authToken string) ([]Author, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Author{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Author{}, errors.New("Unauthorized")
+	}
 	var authors []Author
 	var (
 		id         int
@@ -64,9 +64,9 @@ func GetAllAuthors(authToken string) ([]Author, error) {
 }
 
 func FindAuthor(authorId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Author{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Author{}, errors.New("Unauthorized")
+	}
 	var (
 		id         int
 		first_name string
@@ -98,9 +98,9 @@ func FindAuthor(authorId int, authToken string) (interface{}, error) {
 }
 
 func CreateAuthor(body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Author{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Author{}, errors.New("Unauthorized")
+	}
 	var a Author
 	err := json.NewDecoder(body).Decode(&a)
 	if err != nil {
@@ -121,9 +121,9 @@ func CreateAuthor(body io.Reader, authToken string) (GeneralResponse, error) {
 }
 
 func UpdateAuthor(AuthorId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Author{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Author{}, errors.New("Unauthorized")
+	}
 	var a Author
 	err := json.NewDecoder(body).Decode(&a)
 	query := `
@@ -146,9 +146,9 @@ func UpdateAuthor(AuthorId int, body io.Reader, authToken string) (GeneralRespon
 }
 
 func DeleteAuthor(authorId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	query := `DELETE FROM authors WHERE id=$1`
 	res, err := database.DB.Exec(query, authorId)
 	rowCount, err := res.RowsAffected()

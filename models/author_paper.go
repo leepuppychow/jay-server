@@ -19,9 +19,9 @@ type AuthorPaper struct {
 }
 
 func GetAllAuthorPapers(authToken string) ([]AuthorPaper, error) {
-	// if !ValidToken(authToken) {
-	// 	return []AuthorPaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []AuthorPaper{}, errors.New("Unauthorized")
+	}
 	var aps []AuthorPaper
 	var (
 		id         int
@@ -64,9 +64,9 @@ func GetAllAuthorPapers(authToken string) ([]AuthorPaper, error) {
 }
 
 func FindAuthorPaper(authorPaperId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []AuthorPaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []AuthorPaper{}, errors.New("Unauthorized")
+	}
 	var (
 		id         int
 		paper_id   int
@@ -112,9 +112,9 @@ func CreateAuthorPaperQuery(ap AuthorPaper) (int, error) {
 }
 
 func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []AuthorPaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []AuthorPaper{}, errors.New("Unauthorized")
+	}
 	var ap AuthorPaper
 	err := json.NewDecoder(body).Decode(&ap)
 	if err != nil {
@@ -132,9 +132,9 @@ func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
 }
 
 func UpdateAuthorPaper(authorPaperId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []AuthorPaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []AuthorPaper{}, errors.New("Unauthorized")
+	}
 	var fp AuthorPaper
 	err := json.NewDecoder(body).Decode(&fp)
 	query := `
@@ -157,9 +157,9 @@ func UpdateAuthorPaper(authorPaperId int, body io.Reader, authToken string) (Gen
 }
 
 func DeleteAuthorPaper(authorPaperId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	query := `DELETE FROM author_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, authorPaperId)
 	rowCount, err := res.RowsAffected()

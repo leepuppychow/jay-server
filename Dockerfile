@@ -12,4 +12,4 @@ RUN go install github.com/leepuppychow/jay_medtronic
 
 ENTRYPOINT /go/bin/jay_medtronic
 
-EXPOSE 8080
+EXPOSE 8000

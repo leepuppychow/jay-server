@@ -18,9 +18,9 @@ type Journal struct {
 }
 
 func GetAllJournals(authToken string) ([]Journal, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Journal{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Journal{}, errors.New("Unauthorized")
+	}
 	var journals []Journal
 	var (
 		id         int
@@ -60,9 +60,9 @@ func GetAllJournals(authToken string) ([]Journal, error) {
 }
 
 func FindJournal(journalId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Journal{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Journal{}, errors.New("Unauthorized")
+	}
 	var (
 		id         int
 		name       string
@@ -91,9 +91,9 @@ func FindJournal(journalId int, authToken string) (interface{}, error) {
 }
 
 func CreateJournal(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Journal{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Journal{}, errors.New("Unauthorized")
+	}
 	var j Journal
 	err := json.NewDecoder(body).Decode(&j)
 	if err != nil {
@@ -114,9 +114,9 @@ func CreateJournal(body io.Reader, authToken string) (interface{}, error) {
 }
 
 func UpdateJournal(journalId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Journal{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Journal{}, errors.New("Unauthorized")
+	}
 	var j Journal
 	err := json.NewDecoder(body).Decode(&j)
 	query := `
@@ -138,9 +138,9 @@ func UpdateJournal(journalId int, body io.Reader, authToken string) (GeneralResp
 }
 
 func DeleteJournal(journalId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	query := `DELETE FROM journals WHERE id=$1`
 	res, err := database.DB.Exec(query, journalId)
 	rowCount, err := res.RowsAffected()
