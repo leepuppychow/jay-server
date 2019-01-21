@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/leepuppychow/jay_medtronic/database"
+	"github.com/leepuppychow/jay_medtronic/database"
 	"github.com/leepuppychow/jay_medtronic/env"
 	"github.com/leepuppychow/jay_medtronic/routes"
 
@@ -15,6 +15,7 @@ import (
 func main() {
 	router := routes.NewRouter()
 	fmt.Println("Server running on port 8000")
+	database.InitDB("development")
 	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
