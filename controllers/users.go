@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/leepuppychow/jay_medtronic/auth"
 	"github.com/leepuppychow/jay_medtronic/models"
 )
 
@@ -18,7 +19,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckToken(w http.ResponseWriter, r *http.Request) {
-	valid := models.ValidToken(r.Header.Get("Authorization"))
+	valid := auth.ValidToken(r.Header.Get("Authorization"))
 	if valid {
 		WriteResponse("User Authenticated", nil, 200, w)
 	} else {

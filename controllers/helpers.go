@@ -20,4 +20,3 @@ func WriteResponse(data interface{}, err error, errorCode int, w http.ResponseWr
 	}
 	w.Write(ToJSON(data))
 }
-

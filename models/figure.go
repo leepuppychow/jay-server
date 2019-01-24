@@ -1,7 +1,7 @@
 package models
 
 import (
-	"encoding/json"
+"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,10 +19,7 @@ type Figure struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
-func GetAllFigures(authToken string) ([]Figure, error) {
-	if !ValidToken(authToken) {
-		return []Figure{}, errors.New("Unauthorized")
-	}
+func GetAllFigures() ([]Figure, error) {
 	var figures []Figure
 	var (
 		id          int
@@ -67,10 +64,7 @@ func GetAllFigures(authToken string) ([]Figure, error) {
 	return figures, nil
 }
 
-func FindFigure(figureId int, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Figure{}, errors.New("Unauthorized")
-	}
+func FindFigure(figureId int) (interface{}, error) {
 	var (
 		id          int
 		name        string
@@ -104,10 +98,7 @@ func FindFigure(figureId int, authToken string) (interface{}, error) {
 	return figure, nil
 }
 
-func CreateFigure(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Figure{}, errors.New("Unauthorized")
-	}
+func CreateFigure(body io.Reader) (interface{}, error) {
 	var f Figure
 	err := json.NewDecoder(body).Decode(&f)
 	if err != nil {
@@ -127,10 +118,7 @@ func CreateFigure(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateFigure(figureId int, body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Figure{}, errors.New("Unauthorized")
-	}
+func UpdateFigure(figureId int, body io.Reader) (interface{}, error) {
 	var f Figure
 	err := json.NewDecoder(body).Decode(&f)
 	query := `
@@ -153,10 +141,7 @@ func UpdateFigure(figureId int, body io.Reader, authToken string) (interface{}, 
 	}
 }
 
-func DeleteFigure(figureId int, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func DeleteFigure(figureId int) (GeneralResponse, error) {
 	query := `DELETE FROM figures WHERE id=$1`
 	res, err := database.DB.Exec(query, figureId)
 	rowCount, err := res.RowsAffected()
