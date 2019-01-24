@@ -2,10 +2,12 @@ package auth
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
 func TestCreateToken(t *testing.T) {
+	os.Setenv("SECRET", "something")
 	email := "test@test.com"
 	token := CreateToken(email)
 	fmt.Println(token)
@@ -15,6 +17,7 @@ func TestCreateToken(t *testing.T) {
 }
 
 func TestValidToken(t *testing.T) {
+	os.Setenv("SECRET", "something")
 	email := "test@test.com"
 	token := CreateToken(email)
 
