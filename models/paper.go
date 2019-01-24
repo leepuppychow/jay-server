@@ -42,10 +42,7 @@ type PaperResponse struct {
 	Message string `json:"message"`
 }
 
-func GetAllPapers(authToken string) ([]Paper, error) {
-	if !ValidToken(authToken) {
-		return []Paper{}, errors.New("Unauthorized")
-	}
+func GetAllPapers() ([]Paper, error) {
 	var papers []Paper
 	var (
 		id                        int
@@ -131,10 +128,7 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 	return papers, nil
 }
 
-func FindPaper(paperId int, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return Paper{}, errors.New("Unauthorized")
-	}
+func FindPaper(paperId int) (interface{}, error) {
 	var (
 		id                        int
 		study_id                  int
@@ -252,10 +246,7 @@ func CreatePaperQuery(p Paper) (int, error) {
 	return lastInsertId, err
 }
 
-func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func CreatePaper(body io.Reader) (interface{}, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
@@ -272,10 +263,7 @@ func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
@@ -330,10 +318,7 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 	return GeneralResponse{Message: "Paper, author_papers, device_papers, submissions created successfully"}, nil
 }
 
-func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func UpdatePaper(paperId int, body io.Reader) (GeneralResponse, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	queryString := `
@@ -381,10 +366,7 @@ func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse
 	}
 }
 
-func DeletePaper(id int, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func DeletePaper(id int) (GeneralResponse, error) {
 	queryString := `DELETE FROM papers WHERE id=$1`
 	res, err := database.DB.Exec(queryString, id)
 	rowCount, err := res.RowsAffected()

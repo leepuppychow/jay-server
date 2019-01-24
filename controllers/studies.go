@@ -9,32 +9,32 @@ import (
 )
 
 func StudiesIndex(w http.ResponseWriter, r *http.Request) {
-	data, err := models.GetAllStudies(r.Header.Get("Authorization"))
+	data, err := models.GetAllStudies()
 	WriteResponse(data, err, 400, w)
 }
 
 func StudyShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	data, err := models.FindStudy(id, r.Header.Get("Authorization"))
+	data, err := models.FindStudy(id)
 	WriteResponse(data, err, 400, w)
 }
 
 func CreateStudy(w http.ResponseWriter, r *http.Request) {
-	data, err := models.CreateStudy(r.Body, r.Header.Get("Authorization"))
+	data, err := models.CreateStudy(r.Body)
 	WriteResponse(data, err, 422, w)
 }
 
 func UpdateStudy(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	data, err := models.UpdateStudy(id, r.Body, r.Header.Get("Authorization"))
+	data, err := models.UpdateStudy(id, r.Body)
 	WriteResponse(data, err, 422, w)
 }
 
 func DeleteStudy(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	data, err := models.DeleteStudy(id, r.Header.Get("Authorization"))
+	data, err := models.DeleteStudy(id)
 	WriteResponse(data, err, 400, w)
 }

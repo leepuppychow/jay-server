@@ -17,10 +17,7 @@ type Journal struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func GetAllJournals(authToken string) ([]Journal, error) {
-	if !ValidToken(authToken) {
-		return []Journal{}, errors.New("Unauthorized")
-	}
+func GetAllJournals() ([]Journal, error) {
 	var journals []Journal
 	var (
 		id         int
@@ -59,10 +56,7 @@ func GetAllJournals(authToken string) ([]Journal, error) {
 	return journals, nil
 }
 
-func FindJournal(journalId int, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Journal{}, errors.New("Unauthorized")
-	}
+func FindJournal(journalId int) (interface{}, error) {
 	var (
 		id         int
 		name       string
@@ -90,10 +84,7 @@ func FindJournal(journalId int, authToken string) (interface{}, error) {
 	return journal, nil
 }
 
-func CreateJournal(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Journal{}, errors.New("Unauthorized")
-	}
+func CreateJournal(body io.Reader) (interface{}, error) {
 	var j Journal
 	err := json.NewDecoder(body).Decode(&j)
 	if err != nil {
@@ -113,10 +104,7 @@ func CreateJournal(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateJournal(journalId int, body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Journal{}, errors.New("Unauthorized")
-	}
+func UpdateJournal(journalId int, body io.Reader) (interface{}, error) {
 	var j Journal
 	err := json.NewDecoder(body).Decode(&j)
 	query := `
@@ -137,10 +125,7 @@ func UpdateJournal(journalId int, body io.Reader, authToken string) (interface{}
 	}
 }
 
-func DeleteJournal(journalId int, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func DeleteJournal(journalId int) (GeneralResponse, error) {
 	query := `DELETE FROM journals WHERE id=$1`
 	res, err := database.DB.Exec(query, journalId)
 	rowCount, err := res.RowsAffected()

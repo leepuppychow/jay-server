@@ -24,10 +24,7 @@ type Submission struct {
 	UpdatedAt           string `json:"updated_at"`
 }
 
-func GetAllSubmissions(authToken string) ([]Submission, error) {
-	if !ValidToken(authToken) {
-		return []Submission{}, errors.New("Unauthorized")
-	}
+func GetAllSubmissions() ([]Submission, error) {
 	var submissions []Submission
 	var (
 		id                   int
@@ -84,10 +81,7 @@ func GetAllSubmissions(authToken string) ([]Submission, error) {
 	return submissions, nil
 }
 
-func FindSubmission(submissionId int, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Submission{}, errors.New("Unauthorized")
-	}
+func FindSubmission(submissionId int) (interface{}, error) {
 	var (
 		id                   int
 		paper_id             int
@@ -160,10 +154,7 @@ func CreateSubmissionQuery(s Submission) (int, error) {
 	return lastInsertId, err
 }
 
-func CreateSubmission(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Submission{}, errors.New("Unauthorized")
-	}
+func CreateSubmission(body io.Reader) (interface{}, error) {
 	var s Submission
 	err := json.NewDecoder(body).Decode(&s)
 	if err != nil {
@@ -179,10 +170,7 @@ func CreateSubmission(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateSubmission(submissionId int, body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []Submission{}, errors.New("Unauthorized")
-	}
+func UpdateSubmission(submissionId int, body io.Reader) (interface{}, error) {
 	var s Submission
 	err := json.NewDecoder(body).Decode(&s)
 	query := `
@@ -214,10 +202,7 @@ func UpdateSubmission(submissionId int, body io.Reader, authToken string) (inter
 	}
 }
 
-func DeleteSubmission(submissionId int, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func DeleteSubmission(submissionId int) (GeneralResponse, error) {
 	query := `DELETE FROM submissions WHERE id=$1`
 	res, err := database.DB.Exec(query, submissionId)
 	rowCount, err := res.RowsAffected()

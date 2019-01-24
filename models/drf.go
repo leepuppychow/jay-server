@@ -25,10 +25,7 @@ type DataRequestForm struct {
 	UpdatedAt              string `json:"updated_at"`
 }
 
-func GetAllDataRequestForms(authToken string) ([]DataRequestForm, error) {
-	// if !ValidToken(authToken) {
-	// 	return []DataRequestForm{}, errors.New("Unauthorized")
-	// }
+func GetAllDataRequestForms() ([]DataRequestForm, error) {
 	var drfs []DataRequestForm
 	var (
 		id                       int
@@ -82,10 +79,7 @@ func GetAllDataRequestForms(authToken string) ([]DataRequestForm, error) {
 	return drfs, nil
 }
 
-func FindDataRequestForm(dataRequestFormId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []DataRequestForm{}, errors.New("Unauthorized")
-	// }
+func FindDataRequestForm(dataRequestFormId int) (interface{}, error) {
 	var (
 		id                       int
 		paper_id                 int
@@ -128,10 +122,7 @@ func FindDataRequestForm(dataRequestFormId int, authToken string) (interface{}, 
 	return drf, nil
 }
 
-func CreateDataRequestForm(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []DataRequestForm{}, errors.New("Unauthorized")
-	// }
+func CreateDataRequestForm(body io.Reader) (interface{}, error) {
 	var drf DataRequestForm
 	err := json.NewDecoder(body).Decode(&drf)
 	if err != nil {
@@ -167,10 +158,7 @@ func CreateDataRequestForm(body io.Reader, authToken string) (interface{}, error
 	}
 }
 
-func UpdateDataRequestForm(dataRequestFormId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []DataRequestForm{}, errors.New("Unauthorized")
-	// }
+func UpdateDataRequestForm(dataRequestFormId int, body io.Reader) (GeneralResponse, error) {
 	var drf DataRequestForm
 	err := json.NewDecoder(body).Decode(&drf)
 	query := `
@@ -204,10 +192,7 @@ func UpdateDataRequestForm(dataRequestFormId int, body io.Reader, authToken stri
 	}
 }
 
-func DeleteDataRequestForm(dataRequestFormId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+func DeleteDataRequestForm(dataRequestFormId int) (GeneralResponse, error) {
 	query := `DELETE FROM data_request_forms WHERE id=$1`
 	res, err := database.DB.Exec(query, dataRequestFormId)
 	rowCount, err := res.RowsAffected()

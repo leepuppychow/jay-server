@@ -18,10 +18,7 @@ type AuthorPaper struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func GetAllAuthorPapers(authToken string) ([]AuthorPaper, error) {
-	if !ValidToken(authToken) {
-		return []AuthorPaper{}, errors.New("Unauthorized")
-	}
+func GetAllAuthorPapers() ([]AuthorPaper, error) {
 	var aps []AuthorPaper
 	var (
 		id         int
@@ -63,10 +60,7 @@ func GetAllAuthorPapers(authToken string) ([]AuthorPaper, error) {
 	return aps, nil
 }
 
-func FindAuthorPaper(authorPaperId int, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []AuthorPaper{}, errors.New("Unauthorized")
-	}
+func FindAuthorPaper(authorPaperId int) (interface{}, error) {
 	var (
 		id         int
 		paper_id   int
@@ -111,10 +105,7 @@ func CreateAuthorPaperQuery(ap AuthorPaper) (int, error) {
 	return lastInsertId, err
 }
 
-func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []AuthorPaper{}, errors.New("Unauthorized")
-	}
+func CreateAuthorPaper(body io.Reader) (interface{}, error) {
 	var ap AuthorPaper
 	err := json.NewDecoder(body).Decode(&ap)
 	if err != nil {
@@ -131,10 +122,7 @@ func CreateAuthorPaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateAuthorPaper(authorPaperId int, body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []AuthorPaper{}, errors.New("Unauthorized")
-	}
+func UpdateAuthorPaper(authorPaperId int, body io.Reader) (interface{}, error) {
 	var fp AuthorPaper
 	err := json.NewDecoder(body).Decode(&fp)
 	query := `
@@ -156,10 +144,7 @@ func UpdateAuthorPaper(authorPaperId int, body io.Reader, authToken string) (int
 	}
 }
 
-func DeleteAuthorPaper(authorPaperId int, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func DeleteAuthorPaper(authorPaperId int) (GeneralResponse, error) {
 	query := `DELETE FROM author_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, authorPaperId)
 	rowCount, err := res.RowsAffected()

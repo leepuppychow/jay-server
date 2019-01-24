@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 
+	"github.com/leepuppychow/jay_medtronic/auth"
 	"github.com/leepuppychow/jay_medtronic/database"
 	"github.com/raja/argon2pw"
 )
@@ -66,7 +67,7 @@ func CreateUser(body io.Reader) (UserResponse, error) {
 	} else {
 		return UserResponse{
 			Message: "User created successfully",
-			Token:   CreateToken(user.Email),
+			Token:   auth.CreateToken(user.Email),
 		}, nil
 	}
 }
@@ -94,6 +95,6 @@ func LoginUser(body io.Reader) (UserResponse, error) {
 	}
 	return UserResponse{
 		Message: "User is authenticated",
-		Token:   CreateToken(user.Email),
+		Token:   auth.CreateToken(user.Email),
 	}, nil
 }

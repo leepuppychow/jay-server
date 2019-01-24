@@ -9,32 +9,32 @@ import (
 )
 
 func FigurePapersIndex(w http.ResponseWriter, r *http.Request) {
-	data, err := models.GetAllFigurePapers(r.Header.Get("Authorization"))
+	data, err := models.GetAllFigurePapers()
 	WriteResponse(data, err, 400, w)
 }
 
 func FigurePaperShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	data, err := models.FindFigurePaper(id, r.Header.Get("Authorization"))
+	data, err := models.FindFigurePaper(id)
 	WriteResponse(data, err, 400, w)
 }
 
 func CreateFigurePaper(w http.ResponseWriter, r *http.Request) {
-	data, err := models.CreateFigurePaper(r.Body, r.Header.Get("Authorization"))
+	data, err := models.CreateFigurePaper(r.Body)
 	WriteResponse(data, err, 422, w)
 }
 
 func UpdateFigurePaper(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	data, err := models.UpdateFigurePaper(id, r.Body, r.Header.Get("Authorization"))
+	data, err := models.UpdateFigurePaper(id, r.Body)
 	WriteResponse(data, err, 422, w)
 }
 
 func DeleteFigurePaper(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	data, err := models.DeleteFigurePaper(id, r.Header.Get("Authorization"))
+	data, err := models.DeleteFigurePaper(id)
 	WriteResponse(data, err, 400, w)
 }

@@ -18,10 +18,7 @@ type DevicePaper struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func GetAllDevicePapers(authToken string) ([]DevicePaper, error) {
-	if !ValidToken(authToken) {
-		return []DevicePaper{}, errors.New("Unauthorized")
-	}
+func GetAllDevicePapers() ([]DevicePaper, error) {
 	var dps []DevicePaper
 	var (
 		id         int
@@ -63,10 +60,7 @@ func GetAllDevicePapers(authToken string) ([]DevicePaper, error) {
 	return dps, nil
 }
 
-func FindDevicePaper(devicePaperId int, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []DevicePaper{}, errors.New("Unauthorized")
-	}
+func FindDevicePaper(devicePaperId int) (interface{}, error) {
 	var (
 		id         int
 		paper_id   int
@@ -111,10 +105,7 @@ func CreateDevicePaperQuery(dp DevicePaper) (int, error) {
 	return lastInsertId, err
 }
 
-func CreateDevicePaper(body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []DevicePaper{}, errors.New("Unauthorized")
-	}
+func CreateDevicePaper(body io.Reader) (interface{}, error) {
 	var dp DevicePaper
 	err := json.NewDecoder(body).Decode(&dp)
 	if err != nil {
@@ -130,10 +121,7 @@ func CreateDevicePaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateDevicePaper(devicePaperId int, body io.Reader, authToken string) (interface{}, error) {
-	if !ValidToken(authToken) {
-		return []DevicePaper{}, errors.New("Unauthorized")
-	}
+func UpdateDevicePaper(devicePaperId int, body io.Reader) (interface{}, error) {
 	var dp DevicePaper
 	err := json.NewDecoder(body).Decode(&dp)
 	query := `
@@ -155,10 +143,7 @@ func UpdateDevicePaper(devicePaperId int, body io.Reader, authToken string) (int
 	}
 }
 
-func DeleteDevicePaper(devicePaperId int, authToken string) (GeneralResponse, error) {
-	if !ValidToken(authToken) {
-		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	}
+func DeleteDevicePaper(devicePaperId int) (GeneralResponse, error) {
 	query := `DELETE FROM device_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, devicePaperId)
 	rowCount, err := res.RowsAffected()
