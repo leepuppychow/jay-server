@@ -97,7 +97,7 @@ var routes = Routes{
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.Use(auth.AuthCheck)
+	router.Use(auth.AuthCheck) // Middleware to check token
 	for _, route := range routes {
 		router.
 			Methods(route.Method).
