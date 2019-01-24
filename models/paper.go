@@ -43,9 +43,9 @@ type PaperResponse struct {
 }
 
 func GetAllPapers(authToken string) ([]Paper, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Paper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Paper{}, errors.New("Unauthorized")
+	}
 	var papers []Paper
 	var (
 		id                        int
@@ -99,16 +99,6 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 		if err != nil {
 			fmt.Println(err)
 		}
-
-		authorsChannel := make(chan []Author)
-		figuresChannel := make(chan []Figure)
-		devicesChannel := make(chan []Device)
-		submissionsChannel := make(chan []Submission)
-		go GetAuthorsForPaper(id, authorsChannel)
-		go GetFiguresForPaper(id, figuresChannel)
-		go GetDevicesForPaper(id, devicesChannel)
-		go GetSubmissionsForPaper(id, submissionsChannel)
-
 		paper := Paper{
 			Id:                      id,
 			Title:                   title,
@@ -127,10 +117,10 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 			CreatedAt:               created_at.String(),
 			UpdatedAt:               updated_at.String(),
 			Study:                   study,
-			Authors:                 <-authorsChannel,
-			Figures:                 <-figuresChannel,
-			Devices:                 <-devicesChannel,
-			Submissions:             <-submissionsChannel,
+			Authors:                 <-GetAuthorsForPaper(id),
+			Figures:                 <-GetFiguresForPaper(id),
+			Devices:                 <-GetDevicesForPaper(id),
+			Submissions:             <-GetSubmissionsForPaper(id),
 		}
 		papers = append(papers, paper)
 	}
@@ -142,9 +132,9 @@ func GetAllPapers(authToken string) ([]Paper, error) {
 }
 
 func FindPaper(paperId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return Paper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return Paper{}, errors.New("Unauthorized")
+	}
 	var (
 		id                        int
 		study_id                  int
@@ -189,16 +179,6 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		&updated_at,
 		&study,
 	)
-
-	authorsChannel := make(chan []Author)
-	figuresChannel := make(chan []Figure)
-	devicesChannel := make(chan []Device)
-	submissionsChannel := make(chan []Submission)
-	go GetAuthorsForPaper(id, authorsChannel)
-	go GetFiguresForPaper(id, figuresChannel)
-	go GetDevicesForPaper(id, devicesChannel)
-	go GetSubmissionsForPaper(id, submissionsChannel)
-
 	paper := Paper{
 		Id:                      id,
 		Title:                   title,
@@ -217,10 +197,10 @@ func FindPaper(paperId int, authToken string) (interface{}, error) {
 		CreatedAt:               created_at.String(),
 		UpdatedAt:               updated_at.String(),
 		Study:                   study,
-		Authors:                 <-authorsChannel,
-		Figures:                 <-figuresChannel,
-		Devices:                 <-devicesChannel,
-		Submissions:             <-submissionsChannel,
+		Authors:                 <-GetAuthorsForPaper(id),
+		Figures:                 <-GetFiguresForPaper(id),
+		Devices:                 <-GetDevicesForPaper(id),
+		Submissions:             <-GetSubmissionsForPaper(id),
 	}
 
 	if err != nil {
@@ -273,9 +253,9 @@ func CreatePaperQuery(p Paper) (int, error) {
 }
 
 func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
@@ -293,9 +273,9 @@ func CreatePaper(body io.Reader, authToken string) (interface{}, error) {
 }
 
 func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
@@ -351,9 +331,9 @@ func SpecialCreatePaper(body io.Reader, authToken string) (interface{}, error) {
 }
 
 func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	queryString := `
@@ -402,9 +382,9 @@ func UpdatePaper(paperId int, body io.Reader, authToken string) (GeneralResponse
 }
 
 func DeletePaper(id int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	queryString := `DELETE FROM papers WHERE id=$1`
 	res, err := database.DB.Exec(queryString, id)
 	rowCount, err := res.RowsAffected()

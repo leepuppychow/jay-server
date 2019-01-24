@@ -18,9 +18,9 @@ type Study struct {
 }
 
 func GetAllStudies(authToken string) ([]Study, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Study{}, errors.New("Unauthorized")
+	}
 	var studies []Study
 	var (
 		id         int
@@ -60,9 +60,9 @@ func GetAllStudies(authToken string) ([]Study, error) {
 }
 
 func FindStudy(studyId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Study{}, errors.New("Unauthorized")
+	}
 	var (
 		id         int
 		name       string
@@ -91,9 +91,9 @@ func FindStudy(studyId int, authToken string) (interface{}, error) {
 }
 
 func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []Study{}, errors.New("Unauthorized")
+	}
 	var s Study
 	err := json.NewDecoder(body).Decode(&s)
 	if err != nil {
@@ -113,10 +113,10 @@ func CreateStudy(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateStudy(studyId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []Study{}, errors.New("Unauthorized")
-	// }
+func UpdateStudy(studyId int, body io.Reader, authToken string) (interface{}, error) {
+	if !ValidToken(authToken) {
+		return []Study{}, errors.New("Unauthorized")
+	}
 	var s Study
 	err := json.NewDecoder(body).Decode(&s)
 	query := `
@@ -138,9 +138,9 @@ func UpdateStudy(studyId int, body io.Reader, authToken string) (GeneralResponse
 }
 
 func DeleteStudy(studyId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	query := `DELETE FROM studies WHERE id=$1`
 	res, err := database.DB.Exec(query, studyId)
 	rowCount, err := res.RowsAffected()

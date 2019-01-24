@@ -19,9 +19,9 @@ type FigurePaper struct {
 }
 
 func GetAllFigurePapers(authToken string) ([]FigurePaper, error) {
-	// if !ValidToken(authToken) {
-	// 	return []FigurePaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []FigurePaper{}, errors.New("Unauthorized")
+	}
 	var fps []FigurePaper
 	var (
 		id         int
@@ -64,9 +64,9 @@ func GetAllFigurePapers(authToken string) ([]FigurePaper, error) {
 }
 
 func FindFigurePaper(figurePaperId int, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []FigurePaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []FigurePaper{}, errors.New("Unauthorized")
+	}
 	var (
 		id         int
 		paper_id   int
@@ -98,9 +98,9 @@ func FindFigurePaper(figurePaperId int, authToken string) (interface{}, error) {
 }
 
 func CreateFigurePaper(body io.Reader, authToken string) (interface{}, error) {
-	// if !ValidToken(authToken) {
-	// 	return []FigurePaper{}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return []FigurePaper{}, errors.New("Unauthorized")
+	}
 	var fp FigurePaper
 	err := json.NewDecoder(body).Decode(&fp)
 	if err != nil {
@@ -120,10 +120,10 @@ func CreateFigurePaper(body io.Reader, authToken string) (interface{}, error) {
 	}
 }
 
-func UpdateFigurePaper(figurePaperId int, body io.Reader, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return []FigurePaper{}, errors.New("Unauthorized")
-	// }
+func UpdateFigurePaper(figurePaperId int, body io.Reader, authToken string) (interface{}, error) {
+	if !ValidToken(authToken) {
+		return []FigurePaper{}, errors.New("Unauthorized")
+	}
 	var fp FigurePaper
 	err := json.NewDecoder(body).Decode(&fp)
 	query := `
@@ -146,9 +146,9 @@ func UpdateFigurePaper(figurePaperId int, body io.Reader, authToken string) (Gen
 }
 
 func DeleteFigurePaper(figurePaperId int, authToken string) (GeneralResponse, error) {
-	// if !ValidToken(authToken) {
-	// 	return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
-	// }
+	if !ValidToken(authToken) {
+		return GeneralResponse{Message: "Unauthorized"}, errors.New("Unauthorized")
+	}
 	query := `DELETE FROM figure_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, figurePaperId)
 	rowCount, err := res.RowsAffected()
