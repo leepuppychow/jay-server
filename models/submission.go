@@ -231,61 +231,64 @@ func DeleteSubmission(submissionId int, authToken string) (GeneralResponse, erro
 	return GeneralResponse{Message: "Submission deleted successfully"}, nil
 }
 
-func GetSubmissionsForPaper(paperId int, kawaiiChan chan []Submission) {
-	var submissions []Submission
-	var (
-		id                   int
-		paper_id             int
-		journal_id           int
-		attempt              int
-		manuscript_submitted pq.NullTime
-		manuscript_rejected  pq.NullTime
-		created_at           time.Time
-		updated_at           time.Time
-		journal              string
-	)
-	query := `
-		SELECT submissions.*, journals.name AS journal FROM submissions 
-		INNER JOIN papers ON papers.id = submissions.paper_id
-		INNER JOIN journals ON submissions.journal_id = journals.id
-		WHERE papers.id = $1
-	`
-	rows, err := database.DB.Query(query, paperId)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(
-			&id,
-			&paper_id,
-			&journal_id,
-			&attempt,
-			&manuscript_submitted,
-			&manuscript_rejected,
-			&created_at,
-			&updated_at,
-			&journal,
+func GetSubmissionsForPaper(paperId int) <-chan []Submission {
+	ch := make(chan []Submission)
+	go func() {
+		var submissions []Submission
+		var (
+			id                   int
+			paper_id             int
+			journal_id           int
+			attempt              int
+			manuscript_submitted pq.NullTime
+			manuscript_rejected  pq.NullTime
+			created_at           time.Time
+			updated_at           time.Time
+			journal              string
 		)
+		query := `
+			SELECT submissions.*, journals.name AS journal FROM submissions 
+			INNER JOIN papers ON papers.id = submissions.paper_id
+			INNER JOIN journals ON submissions.journal_id = journals.id
+			WHERE papers.id = $1
+		`
+		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
 			fmt.Println(err)
 		}
-		s := Submission{
-			Id:                  id,
-			PaperId:             paper_id,
-			JournalId:           journal_id,
-			Attempt:             attempt,
-			ManuscriptSubmitted: NullTimeCheck(manuscript_submitted),
-			ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
-			CreatedAt:           created_at.String(),
-			UpdatedAt:           updated_at.String(),
-			Journal:             journal,
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(
+				&id,
+				&paper_id,
+				&journal_id,
+				&attempt,
+				&manuscript_submitted,
+				&manuscript_rejected,
+				&created_at,
+				&updated_at,
+				&journal,
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+			s := Submission{
+				Id:                  id,
+				PaperId:             paper_id,
+				JournalId:           journal_id,
+				Attempt:             attempt,
+				ManuscriptSubmitted: NullTimeCheck(manuscript_submitted),
+				ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
+				CreatedAt:           created_at.String(),
+				UpdatedAt:           updated_at.String(),
+				Journal:             journal,
+			}
+			submissions = append(submissions, s)
 		}
-		submissions = append(submissions, s)
-	}
-
-	if err != nil {
-		fmt.Println("Error getting paper's Submissions", err)
-	}
-	kawaiiChan <- submissions
+		if err != nil {
+			fmt.Println("Error getting paper's Submissions", err)
+		}
+		ch <- submissions
+	}()
+	return ch
 }

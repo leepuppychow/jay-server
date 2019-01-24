@@ -170,52 +170,55 @@ func DeleteFigure(figureId int, authToken string) (GeneralResponse, error) {
 	return GeneralResponse{Message: "Figure deleted successfully"}, nil
 }
 
-func GetFiguresForPaper(paperId int, kawaiiChan chan []Figure) {
-	var figures []Figure
-	var (
-		id          int
-		name        string
-		figure_type string
-		image_file  string
-		created_at  time.Time
-		updated_at  time.Time
-	)
-	query := `
-		SELECT figures.* FROM figures 
-		INNER JOIN figure_papers ON figures.id = figure_papers.figure_id
-		INNER JOIN papers ON papers.id = figure_papers.paper_id
-		WHERE papers.id = $1
-	`
-	rows, err := database.DB.Query(query, paperId)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(
-			&id,
-			&name,
-			&figure_type,
-			&image_file,
-			&created_at,
-			&updated_at,
+func GetFiguresForPaper(paperId int) <-chan []Figure {
+	ch := make(chan []Figure)
+	go func() {
+		var figures []Figure
+		var (
+			id          int
+			name        string
+			figure_type string
+			image_file  string
+			created_at  time.Time
+			updated_at  time.Time
 		)
+		query := `
+			SELECT figures.* FROM figures 
+			INNER JOIN figure_papers ON figures.id = figure_papers.figure_id
+			INNER JOIN papers ON papers.id = figure_papers.paper_id
+			WHERE papers.id = $1
+		`
+		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
 			fmt.Println(err)
 		}
-		figure := Figure{
-			Id:         id,
-			Name:       name,
-			FigureType: figure_type,
-			ImageFile:  image_file,
-			CreatedAt:  created_at.String(),
-			UpdatedAt:  updated_at.String(),
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(
+				&id,
+				&name,
+				&figure_type,
+				&image_file,
+				&created_at,
+				&updated_at,
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+			figure := Figure{
+				Id:         id,
+				Name:       name,
+				FigureType: figure_type,
+				ImageFile:  image_file,
+				CreatedAt:  created_at.String(),
+				UpdatedAt:  updated_at.String(),
+			}
+			figures = append(figures, figure)
 		}
-		figures = append(figures, figure)
-	}
-
-	if err != nil {
-		fmt.Println("Error getting paper's figures", err)
-	}
-	kawaiiChan <- figures
+		if err != nil {
+			fmt.Println("Error getting paper's figures", err)
+		}
+		ch <- figures
+	}()
+	return ch
 }

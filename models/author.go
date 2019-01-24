@@ -162,49 +162,52 @@ func DeleteAuthor(authorId int, authToken string) (GeneralResponse, error) {
 	return GeneralResponse{Message: "Author deleted successfully"}, nil
 }
 
-func GetAuthorsForPaper(paperId int, kawaiiChan chan []Author) {
-	var authors []Author
-	var (
-		id         int
-		first_name string
-		last_name  string
-		created_at time.Time
-		updated_at time.Time
-	)
-	query := `
-		SELECT authors.* FROM authors 
-		INNER JOIN author_papers ON authors.id = author_papers.author_id
-		INNER JOIN papers ON papers.id = author_papers.paper_id
-		WHERE papers.id = $1
-	`
-	rows, err := database.DB.Query(query, paperId)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(
-			&id,
-			&first_name,
-			&last_name,
-			&created_at,
-			&updated_at,
+func GetAuthorsForPaper(paperId int) <-chan []Author {
+	ch := make(chan []Author)
+	go func() {
+		var authors []Author
+		var (
+			id         int
+			first_name string
+			last_name  string
+			created_at time.Time
+			updated_at time.Time
 		)
+		query := `
+			SELECT authors.* FROM authors 
+			INNER JOIN author_papers ON authors.id = author_papers.author_id
+			INNER JOIN papers ON papers.id = author_papers.paper_id
+			WHERE papers.id = $1
+		`
+		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
 			fmt.Println(err)
 		}
-		author := Author{
-			Id:        id,
-			FirstName: first_name,
-			LastName:  last_name,
-			CreatedAt: created_at.String(),
-			UpdatedAt: updated_at.String(),
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(
+				&id,
+				&first_name,
+				&last_name,
+				&created_at,
+				&updated_at,
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+			author := Author{
+				Id:        id,
+				FirstName: first_name,
+				LastName:  last_name,
+				CreatedAt: created_at.String(),
+				UpdatedAt: updated_at.String(),
+			}
+			authors = append(authors, author)
 		}
-		authors = append(authors, author)
-	}
-
-	if err != nil {
-		fmt.Println("Error getting paper's authors", err)
-	}
-	kawaiiChan <- authors
+		if err != nil {
+			fmt.Println("Error getting paper's authors", err)
+		}
+		ch <- authors
+	}()
+	return ch
 }
