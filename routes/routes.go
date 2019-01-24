@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/leepuppychow/jay_medtronic/controllers"
+	"github.com/leepuppychow/jay_medtronic/models"
 )
 
 type Route struct {
@@ -94,8 +95,35 @@ var routes = Routes{
 	{"DeleteDevicePaper", "DELETE", "/api/v1/device_papers/{id}", controllers.DeleteDevicePaper},
 }
 
+func ExcludedRoute(url string) bool {
+	switch url {
+	case "/api/v1/checktoken":
+		return true
+	case "/api/v1/users":
+		return true
+	case "/api/v1/login":
+		return true
+	default:
+		return false
+	}
+}
+
+func AuthMiddleWare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authorized := models.ValidToken(r.Header.Get("Authorization"))
+		if authorized || ExcludedRoute(r.URL.Path) {
+			next.ServeHTTP(w, r)
+		} else {
+			w.WriteHeader(401)
+			w.Write([]byte("Unauthorized"))
+			return
+		}
+	})
+}
+
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
+	router.Use(AuthMiddleWare)
 	for _, route := range routes {
 		router.
 			Methods(route.Method).
