@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type FigurePaper struct {
@@ -30,7 +32,7 @@ func GetAllFigurePapers() ([]FigurePaper, error) {
 	query := `SELECT * FROM figure_papers`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,7 +44,7 @@ func GetAllFigurePapers() ([]FigurePaper, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		fp := FigurePaper{
 			Id:        id,
@@ -56,7 +58,7 @@ func GetAllFigurePapers() ([]FigurePaper, error) {
 	if err != nil {
 		return []FigurePaper{}, err
 	}
-	fmt.Println("Successful GET to FigurePapers index")
+	log.Println("Successful GET to FigurePapers index")
 	return fps, nil
 }
 
@@ -77,8 +79,8 @@ func FindFigurePaper(figurePaperId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	fp := FigurePaper{
 		Id:        id,
@@ -87,7 +89,7 @@ func FindFigurePaper(figurePaperId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find FigurePaper:", id)
+	log.Println("Successful GET to find FigurePaper:", id)
 	return fp, nil
 }
 
@@ -95,7 +97,7 @@ func CreateFigurePaper(body io.Reader) (interface{}, error) {
 	var fp FigurePaper
 	err := json.NewDecoder(body).Decode(&fp)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
 		INSERT INTO figure_papers (paper_id, figure_id, created_at, updated_at)
@@ -103,11 +105,11 @@ func CreateFigurePaper(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, fp.PaperId, fp.FigureId)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create FigurePaper")
-		return GeneralResponse{Message: "FigurePaper created successfully"}, nil
+		log.Println("Successful POST to create FigurePaper")
+		return h.GeneralResponse{Message: "FigurePaper created successfully"}, nil
 	}
 }
 
@@ -125,24 +127,24 @@ func UpdateFigurePaper(figurePaperId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, figurePaperId, fp.PaperId, fp.FigureId)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update FigurePaper")
-		return GeneralResponse{Message: "FigurePaper updated successfully"}, nil
+		log.Println("Successful PUT/PATCH to update FigurePaper")
+		return h.GeneralResponse{Message: "FigurePaper updated successfully"}, nil
 	}
 }
 
-func DeleteFigurePaper(figurePaperId int) (GeneralResponse, error) {
+func DeleteFigurePaper(figurePaperId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM figure_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, figurePaperId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete FigurePaper with id %d", figurePaperId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "FigurePaper deleted successfully"}, nil
+	return h.GeneralResponse{Message: "FigurePaper deleted successfully"}, nil
 }

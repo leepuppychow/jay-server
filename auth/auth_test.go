@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"testing"
 )
@@ -10,7 +10,7 @@ func TestCreateToken(t *testing.T) {
 	os.Setenv("SECRET", "something")
 	email := "test@test.com"
 	token := CreateToken(email)
-	fmt.Println(token)
+	log.Println(token)
 	if token == "" {
 		t.Errorf("CreateToken test failed")
 	}

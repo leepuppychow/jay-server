@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type AuthorPaper struct {
@@ -30,7 +32,7 @@ func GetAllAuthorPapers() ([]AuthorPaper, error) {
 	query := `SELECT * FROM author_papers`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,7 +44,7 @@ func GetAllAuthorPapers() ([]AuthorPaper, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		ap := AuthorPaper{
 			Id:        id,
@@ -56,7 +58,7 @@ func GetAllAuthorPapers() ([]AuthorPaper, error) {
 	if err != nil {
 		return []AuthorPaper{}, err
 	}
-	fmt.Println("Successful GET to AuthorPapers index")
+	log.Println("Successful GET to AuthorPapers index")
 	return aps, nil
 }
 
@@ -77,8 +79,8 @@ func FindAuthorPaper(authorPaperId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	fp := AuthorPaper{
 		Id:        id,
@@ -87,7 +89,7 @@ func FindAuthorPaper(authorPaperId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find AuthorPaper:", id)
+	log.Println("Successful GET to find AuthorPaper:", id)
 	return fp, nil
 }
 
@@ -100,7 +102,7 @@ func CreateAuthorPaperQuery(ap AuthorPaper) (int, error) {
 	lastInsertId := 0
 	err := database.DB.QueryRow(query, ap.PaperId, ap.AuthorId).Scan(&lastInsertId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return lastInsertId, err
 }
@@ -109,16 +111,16 @@ func CreateAuthorPaper(body io.Reader) (interface{}, error) {
 	var ap AuthorPaper
 	err := json.NewDecoder(body).Decode(&ap)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	_, err = CreateAuthorPaperQuery(ap)
 
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create AuthorPaper")
-		return GeneralResponse{Message: "AuthorPaper created successfully"}, nil
+		log.Println("Successful POST to create AuthorPaper")
+		return h.GeneralResponse{Message: "AuthorPaper created successfully"}, nil
 	}
 }
 
@@ -136,24 +138,24 @@ func UpdateAuthorPaper(authorPaperId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, authorPaperId, fp.PaperId, fp.AuthorId)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update AuthorPaper")
-		return GeneralResponse{Message: "AuthorPaper updated successfully"}, nil
+		log.Println("Successful PUT/PATCH to update AuthorPaper")
+		return h.GeneralResponse{Message: "AuthorPaper updated successfully"}, nil
 	}
 }
 
-func DeleteAuthorPaper(authorPaperId int) (GeneralResponse, error) {
+func DeleteAuthorPaper(authorPaperId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM author_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, authorPaperId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete AuthorPaper with id %d", authorPaperId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "AuthorPaper deleted successfully"}, nil
+	return h.GeneralResponse{Message: "AuthorPaper deleted successfully"}, nil
 }

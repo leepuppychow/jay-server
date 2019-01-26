@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type Journal struct {
@@ -28,7 +30,7 @@ func GetAllJournals() ([]Journal, error) {
 	query := `SELECT journals.* FROM journals;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -39,7 +41,7 @@ func GetAllJournals() ([]Journal, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		journal := Journal{
 			Id:        id,
@@ -52,7 +54,7 @@ func GetAllJournals() ([]Journal, error) {
 	if err != nil {
 		return []Journal{}, err
 	}
-	fmt.Println("Successful GET to journals index")
+	log.Println("Successful GET to journals index")
 	return journals, nil
 }
 
@@ -71,8 +73,8 @@ func FindJournal(journalId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	journal := Journal{
 		Id:        id,
@@ -80,7 +82,7 @@ func FindJournal(journalId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find journal: ", id)
+	log.Println("Successful GET to find journal: ", id)
 	return journal, nil
 }
 
@@ -88,7 +90,7 @@ func CreateJournal(body io.Reader) (interface{}, error) {
 	var j Journal
 	err := json.NewDecoder(body).Decode(&j)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
 		INSERT INTO journals (name, created_at, updated_at)
@@ -96,11 +98,11 @@ func CreateJournal(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, j.Name)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create journal")
-		return GeneralResponse{Message: "journal created successfully"}, nil
+		log.Println("Successful POST to create journal")
+		return h.GeneralResponse{Message: "journal created successfully"}, nil
 	}
 }
 
@@ -117,24 +119,24 @@ func UpdateJournal(journalId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, journalId, j.Name)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update journal")
-		return GeneralResponse{Message: "Journal updated successfully"}, nil
+		log.Println("Successful PUT/PATCH to update journal")
+		return h.GeneralResponse{Message: "Journal updated successfully"}, nil
 	}
 }
 
-func DeleteJournal(journalId int) (GeneralResponse, error) {
+func DeleteJournal(journalId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM journals WHERE id=$1`
 	res, err := database.DB.Exec(query, journalId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete journal with id %d", journalId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "Journal deleted successfully"}, nil
+	return h.GeneralResponse{Message: "Journal deleted successfully"}, nil
 }

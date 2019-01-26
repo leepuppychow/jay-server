@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 	"github.com/lib/pq"
 )
 
@@ -69,7 +71,7 @@ func GetAllPapers() ([]Paper, error) {
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 
@@ -94,22 +96,22 @@ func GetAllPapers() ([]Paper, error) {
 			&study,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		paper := Paper{
 			Id:                      id,
 			Title:                   title,
 			Study_Id:                study_id,
-			InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
+			InitialRequestEvaluated: h.NullTimeCheck(initial_request_evaluated),
 			DrfRounds:               drf_rounds,
-			DrfCompleted:            NullTimeCheck(drf_completed),
-			DrfRequestedDelivery:    NullTimeCheck(drf_requested_delivery),
-			DrfActualDelivery:       NullTimeCheck(drf_actual_delivery),
-			DataRefinementComplete:  NullTimeCheck(data_refinement_complete),
-			ManuscriptDrafted:       NullTimeCheck(manuscript_drafted),
-			ManuscriptAccepted:      NullTimeCheck(manuscript_accepted),
-			ManuscriptEpub:          NullTimeCheck(manuscript_epub),
-			ManuscriptPrinted:       NullTimeCheck(manuscript_printed),
+			DrfCompleted:            h.NullTimeCheck(drf_completed),
+			DrfRequestedDelivery:    h.NullTimeCheck(drf_requested_delivery),
+			DrfActualDelivery:       h.NullTimeCheck(drf_actual_delivery),
+			DataRefinementComplete:  h.NullTimeCheck(data_refinement_complete),
+			ManuscriptDrafted:       h.NullTimeCheck(manuscript_drafted),
+			ManuscriptAccepted:      h.NullTimeCheck(manuscript_accepted),
+			ManuscriptEpub:          h.NullTimeCheck(manuscript_epub),
+			ManuscriptPrinted:       h.NullTimeCheck(manuscript_printed),
 			IntExtErp:               int_ext_erp,
 			CreatedAt:               created_at.String(),
 			UpdatedAt:               updated_at.String(),
@@ -124,7 +126,7 @@ func GetAllPapers() ([]Paper, error) {
 	if err != nil {
 		return papers, err
 	}
-	fmt.Println("Successful GET to paper index")
+	log.Println("Successful GET to paper index")
 	return papers, nil
 }
 
@@ -177,16 +179,16 @@ func FindPaper(paperId int) (interface{}, error) {
 		Id:                      id,
 		Title:                   title,
 		Study_Id:                study_id,
-		InitialRequestEvaluated: NullTimeCheck(initial_request_evaluated),
+		InitialRequestEvaluated: h.NullTimeCheck(initial_request_evaluated),
 		DrfRounds:               drf_rounds,
-		DrfCompleted:            NullTimeCheck(drf_completed),
-		DrfRequestedDelivery:    NullTimeCheck(drf_requested_delivery),
-		DrfActualDelivery:       NullTimeCheck(drf_actual_delivery),
-		DataRefinementComplete:  NullTimeCheck(data_refinement_complete),
-		ManuscriptDrafted:       NullTimeCheck(manuscript_drafted),
-		ManuscriptAccepted:      NullTimeCheck(manuscript_accepted),
-		ManuscriptEpub:          NullTimeCheck(manuscript_epub),
-		ManuscriptPrinted:       NullTimeCheck(manuscript_printed),
+		DrfCompleted:            h.NullTimeCheck(drf_completed),
+		DrfRequestedDelivery:    h.NullTimeCheck(drf_requested_delivery),
+		DrfActualDelivery:       h.NullTimeCheck(drf_actual_delivery),
+		DataRefinementComplete:  h.NullTimeCheck(data_refinement_complete),
+		ManuscriptDrafted:       h.NullTimeCheck(manuscript_drafted),
+		ManuscriptAccepted:      h.NullTimeCheck(manuscript_accepted),
+		ManuscriptEpub:          h.NullTimeCheck(manuscript_epub),
+		ManuscriptPrinted:       h.NullTimeCheck(manuscript_printed),
 		IntExtErp:               int_ext_erp,
 		CreatedAt:               created_at.String(),
 		UpdatedAt:               updated_at.String(),
@@ -198,8 +200,8 @@ func FindPaper(paperId int) (interface{}, error) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: "Error finding paper"}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: "Error finding paper"}, err
 	}
 	return paper, nil
 }
@@ -230,16 +232,16 @@ func CreatePaperQuery(p Paper) (int, error) {
 	err := database.DB.QueryRow(queryString,
 		p.Title,
 		p.Study_Id,
-		InvalidTimeWillBeNull(p.InitialRequestEvaluated),
+		h.InvalidTimeWillBeNull(p.InitialRequestEvaluated),
 		p.DrfRounds,
-		InvalidTimeWillBeNull(p.DrfCompleted),
-		InvalidTimeWillBeNull(p.DrfRequestedDelivery),
-		InvalidTimeWillBeNull(p.DrfActualDelivery),
-		InvalidTimeWillBeNull(p.DataRefinementComplete),
-		InvalidTimeWillBeNull(p.ManuscriptDrafted),
-		InvalidTimeWillBeNull(p.ManuscriptAccepted),
-		InvalidTimeWillBeNull(p.ManuscriptEpub),
-		InvalidTimeWillBeNull(p.ManuscriptPrinted),
+		h.InvalidTimeWillBeNull(p.DrfCompleted),
+		h.InvalidTimeWillBeNull(p.DrfRequestedDelivery),
+		h.InvalidTimeWillBeNull(p.DrfActualDelivery),
+		h.InvalidTimeWillBeNull(p.DataRefinementComplete),
+		h.InvalidTimeWillBeNull(p.ManuscriptDrafted),
+		h.InvalidTimeWillBeNull(p.ManuscriptAccepted),
+		h.InvalidTimeWillBeNull(p.ManuscriptEpub),
+		h.InvalidTimeWillBeNull(p.ManuscriptPrinted),
 		p.IntExtErp,
 	).Scan(&lastInsertId)
 
@@ -250,15 +252,15 @@ func CreatePaper(body io.Reader) (interface{}, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	lastInsertId, err := CreatePaperQuery(p)
 
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: "Unable to create paper"}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: "Unable to create paper"}, err
 	} else {
-		fmt.Println("Successful POST to create paper")
+		log.Println("Successful POST to create paper")
 		return PaperResponse{PaperId: lastInsertId, Message: "Paper created successfully"}, nil
 	}
 }
@@ -267,13 +269,13 @@ func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	paperId, err := CreatePaperQuery(p)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 
 	// Now create associated resources (joins tables)
@@ -285,11 +287,11 @@ func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 		}
 		_, err = CreateAuthorPaperQuery(ap)
 		if err != nil {
-			fmt.Println(err)
-			return GeneralResponse{Message: err.Error()}, err
+			log.Println(err)
+			return h.GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	fmt.Println("Author_papers created successfully")
+	log.Println("Author_papers created successfully")
 
 	for _, deviceId := range p.Device_Ids {
 		dp := DevicePaper{
@@ -298,27 +300,27 @@ func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 		}
 		_, err = CreateDevicePaperQuery(dp)
 		if err != nil {
-			fmt.Println(err)
-			return GeneralResponse{Message: err.Error()}, err
+			log.Println(err)
+			return h.GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	fmt.Println("Device_papers created successfully")
+	log.Println("Device_papers created successfully")
 
 	for i, s := range p.Submissions {
 		s.PaperId = paperId
 		s.Attempt = i + 1
 		_, err = CreateSubmissionQuery(s)
 		if err != nil {
-			fmt.Println(err)
-			return GeneralResponse{Message: err.Error()}, err
+			log.Println(err)
+			return h.GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	fmt.Println("Submissions created successfully")
+	log.Println("Submissions created successfully")
 
-	return GeneralResponse{Message: "Paper, author_papers, device_papers, submissions created successfully"}, nil
+	return h.GeneralResponse{Message: "Paper, author_papers, device_papers, submissions created successfully"}, nil
 }
 
-func UpdatePaper(paperId int, body io.Reader) (GeneralResponse, error) {
+func UpdatePaper(paperId int, body io.Reader) (h.GeneralResponse, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	queryString := `
@@ -344,38 +346,38 @@ func UpdatePaper(paperId int, body io.Reader) (GeneralResponse, error) {
 		paperId,
 		p.Title,
 		p.Study_Id,
-		InvalidTimeWillBeNull(p.InitialRequestEvaluated),
+		h.InvalidTimeWillBeNull(p.InitialRequestEvaluated),
 		p.DrfRounds,
-		InvalidTimeWillBeNull(p.DrfCompleted),
-		InvalidTimeWillBeNull(p.DrfRequestedDelivery),
-		InvalidTimeWillBeNull(p.DrfActualDelivery),
-		InvalidTimeWillBeNull(p.DataRefinementComplete),
-		InvalidTimeWillBeNull(p.ManuscriptDrafted),
-		InvalidTimeWillBeNull(p.ManuscriptAccepted),
-		InvalidTimeWillBeNull(p.ManuscriptEpub),
-		InvalidTimeWillBeNull(p.ManuscriptPrinted),
+		h.InvalidTimeWillBeNull(p.DrfCompleted),
+		h.InvalidTimeWillBeNull(p.DrfRequestedDelivery),
+		h.InvalidTimeWillBeNull(p.DrfActualDelivery),
+		h.InvalidTimeWillBeNull(p.DataRefinementComplete),
+		h.InvalidTimeWillBeNull(p.ManuscriptDrafted),
+		h.InvalidTimeWillBeNull(p.ManuscriptAccepted),
+		h.InvalidTimeWillBeNull(p.ManuscriptEpub),
+		h.InvalidTimeWillBeNull(p.ManuscriptPrinted),
 		p.IntExtErp,
 	)
 
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: "Unable to update paper"}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: "Unable to update paper"}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update paper")
-		return GeneralResponse{Message: "Paper updated successfully"}, nil
+		log.Println("Successful PUT/PATCH to update paper")
+		return h.GeneralResponse{Message: "Paper updated successfully"}, nil
 	}
 }
 
-func DeletePaper(id int) (GeneralResponse, error) {
+func DeletePaper(id int) (h.GeneralResponse, error) {
 	queryString := `DELETE FROM papers WHERE id=$1`
 	res, err := database.DB.Exec(queryString, id)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete study with id %d", id)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "Paper deleted successfully"}, nil
+	return h.GeneralResponse{Message: "Paper deleted successfully"}, nil
 }

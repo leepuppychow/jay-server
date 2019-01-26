@@ -7,9 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 	"github.com/lib/pq"
 )
 
@@ -41,7 +43,7 @@ func GetAllDataRequestForms() ([]DataRequestForm, error) {
 	query := `SELECT * FROM data_request_forms;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -57,7 +59,7 @@ func GetAllDataRequestForms() ([]DataRequestForm, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		drf := DataRequestForm{
 			Id:                     id,
@@ -75,7 +77,7 @@ func GetAllDataRequestForms() ([]DataRequestForm, error) {
 	if err != nil {
 		return []DataRequestForm{}, err
 	}
-	fmt.Println("Successful GET to Data Request Forms index")
+	log.Println("Successful GET to Data Request Forms index")
 	return drfs, nil
 }
 
@@ -104,8 +106,8 @@ func FindDataRequestForm(dataRequestFormId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	drf := DataRequestForm{
 		Id:                     id,
@@ -118,7 +120,7 @@ func FindDataRequestForm(dataRequestFormId int) (interface{}, error) {
 		CreatedAt:              created_at.String(),
 		UpdatedAt:              updated_at.String(),
 	}
-	fmt.Println("Successful GET to find Data Request Form:", id)
+	log.Println("Successful GET to find Data Request Form:", id)
 	return drf, nil
 }
 
@@ -126,7 +128,7 @@ func CreateDataRequestForm(body io.Reader) (interface{}, error) {
 	var drf DataRequestForm
 	err := json.NewDecoder(body).Decode(&drf)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
 		INSERT INTO data_request_forms (
@@ -150,15 +152,15 @@ func CreateDataRequestForm(body io.Reader) (interface{}, error) {
 		drf.DataRefinementComplete,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create DataRequestForm")
-		return GeneralResponse{Message: "DataRequestForm created successfully"}, nil
+		log.Println("Successful POST to create DataRequestForm")
+		return h.GeneralResponse{Message: "DataRequestForm created successfully"}, nil
 	}
 }
 
-func UpdateDataRequestForm(dataRequestFormId int, body io.Reader) (GeneralResponse, error) {
+func UpdateDataRequestForm(dataRequestFormId int, body io.Reader) (h.GeneralResponse, error) {
 	var drf DataRequestForm
 	err := json.NewDecoder(body).Decode(&drf)
 	query := `
@@ -184,26 +186,26 @@ func UpdateDataRequestForm(dataRequestFormId int, body io.Reader) (GeneralRespon
 		drf.DataRefinementComplete,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update DataRequestForm")
-		return GeneralResponse{Message: "DataRequestForm updated successfully"}, nil
+		log.Println("Successful PUT/PATCH to update DataRequestForm")
+		return h.GeneralResponse{Message: "DataRequestForm updated successfully"}, nil
 	}
 }
 
-func DeleteDataRequestForm(dataRequestFormId int) (GeneralResponse, error) {
+func DeleteDataRequestForm(dataRequestFormId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM data_request_forms WHERE id=$1`
 	res, err := database.DB.Exec(query, dataRequestFormId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete DataRequestForm with id %d", dataRequestFormId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "DataRequestForm deleted successfully"}, nil
+	return h.GeneralResponse{Message: "DataRequestForm deleted successfully"}, nil
 }
 
 func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm) {
@@ -226,7 +228,7 @@ func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm)
 	`
 	rows, err := database.DB.Query(query, paperId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -242,16 +244,16 @@ func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm)
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		DRF := DataRequestForm{
 			Id:                     id,
 			PaperId:                paper_id,
 			Round:                  round,
-			FormCompleted:          NullTimeCheck(form_completed),
-			RequestedDelivery:      NullTimeCheck(requested_delivery),
-			ActualDelivery:         NullTimeCheck(actual_delivery),
-			DataRefinementComplete: NullTimeCheck(data_refinement_complete),
+			FormCompleted:          h.NullTimeCheck(form_completed),
+			RequestedDelivery:      h.NullTimeCheck(requested_delivery),
+			ActualDelivery:         h.NullTimeCheck(actual_delivery),
+			DataRefinementComplete: h.NullTimeCheck(data_refinement_complete),
 			CreatedAt:              created_at.String(),
 			UpdatedAt:              updated_at.String(),
 		}
@@ -259,7 +261,7 @@ func GetDataRequestFormsForPaper(paperId int, kawaiiChan chan []DataRequestForm)
 	}
 
 	if err != nil {
-		fmt.Println("Error getting paper's DRFs", err)
+		log.Println("Error getting paper's DRFs", err)
 	}
 	kawaiiChan <- DRFs
 }

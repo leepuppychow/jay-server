@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -44,7 +44,7 @@ func ValidToken(tokenString string) bool {
 		return []byte(secret), nil
 	})
 	if err != nil || !token.Valid {
-		fmt.Println("Error validating token or invalid token:", err)
+		log.Println("Error validating token or invalid token:", err)
 		return false
 	}
 	return true
@@ -59,7 +59,7 @@ func CreateToken(email string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": email})
 	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
-		fmt.Println("Error creating token:", err)
+		log.Println("Error creating token:", err)
 	}
 	return tokenString
 }

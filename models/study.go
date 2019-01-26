@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type Study struct {
@@ -28,7 +30,7 @@ func GetAllStudies() ([]Study, error) {
 	query := `SELECT studies.* FROM studies;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -39,7 +41,7 @@ func GetAllStudies() ([]Study, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		study := Study{
 			Id:        id,
@@ -52,7 +54,7 @@ func GetAllStudies() ([]Study, error) {
 	if err != nil {
 		return []Study{}, err
 	}
-	fmt.Println("Successful GET to studies index")
+	log.Println("Successful GET to studies index")
 	return studies, nil
 }
 
@@ -71,8 +73,8 @@ func FindStudy(studyId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	study := Study{
 		Id:        id,
@@ -80,7 +82,7 @@ func FindStudy(studyId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find study: ", id)
+	log.Println("Successful GET to find study: ", id)
 	return study, nil
 }
 
@@ -88,7 +90,7 @@ func CreateStudy(body io.Reader) (interface{}, error) {
 	var s Study
 	err := json.NewDecoder(body).Decode(&s)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
 		INSERT INTO studies (name, created_at, updated_at)
@@ -96,11 +98,11 @@ func CreateStudy(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, s.Name)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create study")
-		return GeneralResponse{Message: "Study created successfully"}, nil
+		log.Println("Successful POST to create study")
+		return h.GeneralResponse{Message: "Study created successfully"}, nil
 	}
 }
 
@@ -117,24 +119,24 @@ func UpdateStudy(studyId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, studyId, s.Name)
 	if err != nil {
-		fmt.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		log.Println(err)
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update study")
-		return GeneralResponse{Message: "Study updated successfully"}, nil
+		log.Println("Successful PUT/PATCH to update study")
+		return h.GeneralResponse{Message: "Study updated successfully"}, nil
 	}
 }
 
-func DeleteStudy(studyId int) (GeneralResponse, error) {
+func DeleteStudy(studyId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM studies WHERE id=$1`
 	res, err := database.DB.Exec(query, studyId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete study with id %d", studyId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "Study deleted successfully"}, nil
+	return h.GeneralResponse{Message: "Study deleted successfully"}, nil
 }
