@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -30,7 +31,7 @@ func GetAllAuthorPapers() ([]AuthorPaper, error) {
 	query := `SELECT * FROM author_papers`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,7 +43,7 @@ func GetAllAuthorPapers() ([]AuthorPaper, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		ap := AuthorPaper{
 			Id:        id,
@@ -56,7 +57,7 @@ func GetAllAuthorPapers() ([]AuthorPaper, error) {
 	if err != nil {
 		return []AuthorPaper{}, err
 	}
-	fmt.Println("Successful GET to AuthorPapers index")
+	log.Println("Successful GET to AuthorPapers index")
 	return aps, nil
 }
 
@@ -77,7 +78,7 @@ func FindAuthorPaper(authorPaperId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	fp := AuthorPaper{
@@ -87,7 +88,7 @@ func FindAuthorPaper(authorPaperId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find AuthorPaper:", id)
+	log.Println("Successful GET to find AuthorPaper:", id)
 	return fp, nil
 }
 
@@ -100,7 +101,7 @@ func CreateAuthorPaperQuery(ap AuthorPaper) (int, error) {
 	lastInsertId := 0
 	err := database.DB.QueryRow(query, ap.PaperId, ap.AuthorId).Scan(&lastInsertId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return lastInsertId, err
 }
@@ -114,10 +115,10 @@ func CreateAuthorPaper(body io.Reader) (interface{}, error) {
 	_, err = CreateAuthorPaperQuery(ap)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create AuthorPaper")
+		log.Println("Successful POST to create AuthorPaper")
 		return GeneralResponse{Message: "AuthorPaper created successfully"}, nil
 	}
 }
@@ -136,10 +137,10 @@ func UpdateAuthorPaper(authorPaperId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, authorPaperId, fp.PaperId, fp.AuthorId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update AuthorPaper")
+		log.Println("Successful PUT/PATCH to update AuthorPaper")
 		return GeneralResponse{Message: "AuthorPaper updated successfully"}, nil
 	}
 }

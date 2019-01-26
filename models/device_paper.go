@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -30,7 +31,7 @@ func GetAllDevicePapers() ([]DevicePaper, error) {
 	query := `SELECT * FROM device_papers`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,7 +43,7 @@ func GetAllDevicePapers() ([]DevicePaper, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		dp := DevicePaper{
 			Id:        id,
@@ -56,7 +57,7 @@ func GetAllDevicePapers() ([]DevicePaper, error) {
 	if err != nil {
 		return []DevicePaper{}, err
 	}
-	fmt.Println("Successful GET to DevicePapers index")
+	log.Println("Successful GET to DevicePapers index")
 	return dps, nil
 }
 
@@ -77,7 +78,7 @@ func FindDevicePaper(devicePaperId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	dp := DevicePaper{
@@ -87,7 +88,7 @@ func FindDevicePaper(devicePaperId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find DevicePaper:", id)
+	log.Println("Successful GET to find DevicePaper:", id)
 	return dp, nil
 }
 
@@ -100,7 +101,7 @@ func CreateDevicePaperQuery(dp DevicePaper) (int, error) {
 	lastInsertId := 0
 	err := database.DB.QueryRow(query, dp.PaperId, dp.DeviceId).Scan(&lastInsertId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return lastInsertId, err
 }
@@ -113,10 +114,10 @@ func CreateDevicePaper(body io.Reader) (interface{}, error) {
 	}
 	_, err = CreateDevicePaperQuery(dp)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create DevicePaper")
+		log.Println("Successful POST to create DevicePaper")
 		return GeneralResponse{Message: "DevicePaper created successfully"}, nil
 	}
 }
@@ -135,10 +136,10 @@ func UpdateDevicePaper(devicePaperId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, devicePaperId, dp.PaperId, dp.DeviceId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update DevicePaper")
+		log.Println("Successful PUT/PATCH to update DevicePaper")
 		return GeneralResponse{Message: "DevicePaper updated successfully"}, nil
 	}
 }

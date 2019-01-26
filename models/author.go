@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -30,7 +31,7 @@ func GetAllAuthors() ([]Author, error) {
 	query := `SELECT authors.* FROM authors;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,7 +43,7 @@ func GetAllAuthors() ([]Author, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		author := Author{
 			Id:        id,
@@ -56,7 +57,7 @@ func GetAllAuthors() ([]Author, error) {
 	if err != nil {
 		return []Author{}, err
 	}
-	fmt.Println("Successful GET to authors index")
+	log.Println("Successful GET to authors index")
 	return authors, nil
 }
 
@@ -77,7 +78,7 @@ func FindAuthor(authorId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	author := Author{
@@ -87,7 +88,7 @@ func FindAuthor(authorId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find author: ", id)
+	log.Println("Successful GET to find author: ", id)
 	return author, nil
 }
 
@@ -103,10 +104,10 @@ func CreateAuthor(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, a.FirstName, a.LastName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create Author")
+		log.Println("Successful POST to create Author")
 		return GeneralResponse{Message: "Author created successfully"}, nil
 	}
 }
@@ -125,10 +126,10 @@ func UpdateAuthor(AuthorId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, AuthorId, a.FirstName, a.LastName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update author")
+		log.Println("Successful PUT/PATCH to update author")
 		return GeneralResponse{Message: "Author updated successfully"}, nil
 	}
 }
@@ -166,7 +167,7 @@ func GetAuthorsForPaper(paperId int) <-chan []Author {
 		`
 		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -178,7 +179,7 @@ func GetAuthorsForPaper(paperId int) <-chan []Author {
 				&updated_at,
 			)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			author := Author{
 				Id:        id,
@@ -190,7 +191,7 @@ func GetAuthorsForPaper(paperId int) <-chan []Author {
 			authors = append(authors, author)
 		}
 		if err != nil {
-			fmt.Println("Error getting paper's authors", err)
+			log.Println("Error getting paper's authors", err)
 		}
 		ch <- authors
 	}()

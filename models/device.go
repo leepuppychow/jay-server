@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -28,7 +29,7 @@ func GetAllDevices() ([]Device, error) {
 	query := `SELECT * FROM devices;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -39,7 +40,7 @@ func GetAllDevices() ([]Device, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		device := Device{
 			Id:        id,
@@ -52,7 +53,7 @@ func GetAllDevices() ([]Device, error) {
 	if err != nil {
 		return []Device{}, err
 	}
-	fmt.Println("Successful GET to devices index")
+	log.Println("Successful GET to devices index")
 	return devices, nil
 }
 
@@ -71,7 +72,7 @@ func FindDevice(deviceId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	device := Device{
@@ -80,7 +81,7 @@ func FindDevice(deviceId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find device: ", id)
+	log.Println("Successful GET to find device: ", id)
 	return device, nil
 }
 
@@ -96,10 +97,10 @@ func CreateDevice(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, d.Name)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create device")
+		log.Println("Successful POST to create device")
 		return GeneralResponse{Message: "Device created successfully"}, nil
 	}
 }
@@ -117,10 +118,10 @@ func UpdateDevice(deviceId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, deviceId, d.Name)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update device")
+		log.Println("Successful PUT/PATCH to update device")
 		return GeneralResponse{Message: "Device updated successfully"}, nil
 	}
 }
@@ -157,7 +158,7 @@ func GetDevicesForPaper(paperId int) <-chan []Device {
 		`
 		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -168,7 +169,7 @@ func GetDevicesForPaper(paperId int) <-chan []Device {
 				&updated_at,
 			)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			device := Device{
 				Id:        id,
@@ -179,7 +180,7 @@ func GetDevicesForPaper(paperId int) <-chan []Device {
 			devices = append(devices, device)
 		}
 		if err != nil {
-			fmt.Println("Error getting paper's devices", err)
+			log.Println("Error getting paper's devices", err)
 		}
 		ch <- devices
 	}()

@@ -2,14 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func ToJSON(arg interface{}) []byte {
 	json, err := json.MarshalIndent(arg, "", "   ")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	return json
 }

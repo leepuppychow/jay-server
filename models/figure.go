@@ -1,10 +1,11 @@
 package models
 
 import (
-"encoding/json"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -32,7 +33,7 @@ func GetAllFigures() ([]Figure, error) {
 	query := `SELECT * FROM figures;`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -45,7 +46,7 @@ func GetAllFigures() ([]Figure, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		figure := Figure{
 			Id:         id,
@@ -60,7 +61,7 @@ func GetAllFigures() ([]Figure, error) {
 	if err != nil {
 		return []Figure{}, err
 	}
-	fmt.Println("Successful GET to figures index")
+	log.Println("Successful GET to figures index")
 	return figures, nil
 }
 
@@ -83,7 +84,7 @@ func FindFigure(figureId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	figure := Figure{
@@ -94,7 +95,7 @@ func FindFigure(figureId int) (interface{}, error) {
 		CreatedAt:  created_at.String(),
 		UpdatedAt:  updated_at.String(),
 	}
-	fmt.Println("Successful GET to find figure:", id)
+	log.Println("Successful GET to find figure:", id)
 	return figure, nil
 }
 
@@ -110,10 +111,10 @@ func CreateFigure(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, f.Name, f.FigureType, f.ImageFile)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create figure")
+		log.Println("Successful POST to create figure")
 		return GeneralResponse{Message: "Figure created successfully"}, nil
 	}
 }
@@ -133,10 +134,10 @@ func UpdateFigure(figureId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, figureId, f.Name, f.FigureType, f.ImageFile)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update figure")
+		log.Println("Successful PUT/PATCH to update figure")
 		return GeneralResponse{Message: "Figure updated successfully"}, nil
 	}
 }
@@ -175,7 +176,7 @@ func GetFiguresForPaper(paperId int) <-chan []Figure {
 		`
 		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -188,7 +189,7 @@ func GetFiguresForPaper(paperId int) <-chan []Figure {
 				&updated_at,
 			)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			figure := Figure{
 				Id:         id,
@@ -201,7 +202,7 @@ func GetFiguresForPaper(paperId int) <-chan []Figure {
 			figures = append(figures, figure)
 		}
 		if err != nil {
-			fmt.Println("Error getting paper's figures", err)
+			log.Println("Error getting paper's figures", err)
 		}
 		ch <- figures
 	}()

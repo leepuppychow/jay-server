@@ -17,11 +17,11 @@ var DevelopmentDB = "user=leechow dbname=jay_medtronic_development sslmode=disab
 func main() {
 	port := 3000
 	router := routes.NewRouter()
-	fmt.Println("Server running on port:", port)
+	log.Println("Server running on port:", port)
 
 	dbConn, ok := os.LookupEnv("DB_CONN")
 	if !ok {
-		fmt.Println("Using development DB")
+		log.Println("Using development DB")
 		dbConn = DevelopmentDB
 	}
 	database.InitDB(dbConn)

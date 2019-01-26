@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -69,7 +70,7 @@ func GetAllPapers() ([]Paper, error) {
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 
@@ -94,7 +95,7 @@ func GetAllPapers() ([]Paper, error) {
 			&study,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		paper := Paper{
 			Id:                      id,
@@ -124,7 +125,7 @@ func GetAllPapers() ([]Paper, error) {
 	if err != nil {
 		return papers, err
 	}
-	fmt.Println("Successful GET to paper index")
+	log.Println("Successful GET to paper index")
 	return papers, nil
 }
 
@@ -198,7 +199,7 @@ func FindPaper(paperId int) (interface{}, error) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: "Error finding paper"}, err
 	}
 	return paper, nil
@@ -255,10 +256,10 @@ func CreatePaper(body io.Reader) (interface{}, error) {
 	lastInsertId, err := CreatePaperQuery(p)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: "Unable to create paper"}, err
 	} else {
-		fmt.Println("Successful POST to create paper")
+		log.Println("Successful POST to create paper")
 		return PaperResponse{PaperId: lastInsertId, Message: "Paper created successfully"}, nil
 	}
 }
@@ -267,12 +268,12 @@ func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 	var p Paper
 	err := json.NewDecoder(body).Decode(&p)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	paperId, err := CreatePaperQuery(p)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 
@@ -285,11 +286,11 @@ func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 		}
 		_, err = CreateAuthorPaperQuery(ap)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	fmt.Println("Author_papers created successfully")
+	log.Println("Author_papers created successfully")
 
 	for _, deviceId := range p.Device_Ids {
 		dp := DevicePaper{
@@ -298,22 +299,22 @@ func SpecialCreatePaper(body io.Reader) (interface{}, error) {
 		}
 		_, err = CreateDevicePaperQuery(dp)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	fmt.Println("Device_papers created successfully")
+	log.Println("Device_papers created successfully")
 
 	for i, s := range p.Submissions {
 		s.PaperId = paperId
 		s.Attempt = i + 1
 		_, err = CreateSubmissionQuery(s)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return GeneralResponse{Message: err.Error()}, err
 		}
 	}
-	fmt.Println("Submissions created successfully")
+	log.Println("Submissions created successfully")
 
 	return GeneralResponse{Message: "Paper, author_papers, device_papers, submissions created successfully"}, nil
 }
@@ -358,10 +359,10 @@ func UpdatePaper(paperId int, body io.Reader) (GeneralResponse, error) {
 	)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: "Unable to update paper"}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update paper")
+		log.Println("Successful PUT/PATCH to update paper")
 		return GeneralResponse{Message: "Paper updated successfully"}, nil
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/lib/pq"
@@ -43,7 +44,7 @@ func GetAllSubmissions() ([]Submission, error) {
 	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -59,7 +60,7 @@ func GetAllSubmissions() ([]Submission, error) {
 			&journal,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		submission := Submission{
 			Id:                  id,
@@ -77,7 +78,7 @@ func GetAllSubmissions() ([]Submission, error) {
 	if err != nil {
 		return []Submission{}, err
 	}
-	fmt.Println("Successful GET to Submissions index")
+	log.Println("Successful GET to Submissions index")
 	return submissions, nil
 }
 
@@ -110,7 +111,7 @@ func FindSubmission(submissionId int) (interface{}, error) {
 		&journal,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	s := Submission{
@@ -124,7 +125,7 @@ func FindSubmission(submissionId int) (interface{}, error) {
 		UpdatedAt:           updated_at.String(),
 		Journal:             journal,
 	}
-	fmt.Println("Successful GET to find Submission: ", id)
+	log.Println("Successful GET to find Submission: ", id)
 	return s, nil
 }
 
@@ -162,10 +163,10 @@ func CreateSubmission(body io.Reader) (interface{}, error) {
 	}
 	lastInsertId, err := CreateSubmissionQuery(s)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create Submission", lastInsertId)
+		log.Println("Successful POST to create Submission", lastInsertId)
 		return GeneralResponse{Message: "Submission created successfully"}, nil
 	}
 }
@@ -194,10 +195,10 @@ func UpdateSubmission(submissionId int, body io.Reader) (interface{}, error) {
 		s.ManuscriptRejected,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update Submission")
+		log.Println("Successful PUT/PATCH to update Submission")
 		return GeneralResponse{Message: "Submission updated successfully"}, nil
 	}
 }
@@ -239,7 +240,7 @@ func GetSubmissionsForPaper(paperId int) <-chan []Submission {
 		`
 		rows, err := database.DB.Query(query, paperId)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -255,7 +256,7 @@ func GetSubmissionsForPaper(paperId int) <-chan []Submission {
 				&journal,
 			)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
 			s := Submission{
 				Id:                  id,
@@ -271,7 +272,7 @@ func GetSubmissionsForPaper(paperId int) <-chan []Submission {
 			submissions = append(submissions, s)
 		}
 		if err != nil {
-			fmt.Println("Error getting paper's Submissions", err)
+			log.Println("Error getting paper's Submissions", err)
 		}
 		ch <- submissions
 	}()

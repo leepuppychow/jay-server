@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
@@ -30,7 +31,7 @@ func GetAllFigurePapers() ([]FigurePaper, error) {
 	query := `SELECT * FROM figure_papers`
 	rows, err := database.DB.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,7 +43,7 @@ func GetAllFigurePapers() ([]FigurePaper, error) {
 			&updated_at,
 		)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		fp := FigurePaper{
 			Id:        id,
@@ -56,7 +57,7 @@ func GetAllFigurePapers() ([]FigurePaper, error) {
 	if err != nil {
 		return []FigurePaper{}, err
 	}
-	fmt.Println("Successful GET to FigurePapers index")
+	log.Println("Successful GET to FigurePapers index")
 	return fps, nil
 }
 
@@ -77,7 +78,7 @@ func FindFigurePaper(figurePaperId int) (interface{}, error) {
 		&updated_at,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	}
 	fp := FigurePaper{
@@ -87,7 +88,7 @@ func FindFigurePaper(figurePaperId int) (interface{}, error) {
 		CreatedAt: created_at.String(),
 		UpdatedAt: updated_at.String(),
 	}
-	fmt.Println("Successful GET to find FigurePaper:", id)
+	log.Println("Successful GET to find FigurePaper:", id)
 	return fp, nil
 }
 
@@ -103,10 +104,10 @@ func CreateFigurePaper(body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, fp.PaperId, fp.FigureId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful POST to create FigurePaper")
+		log.Println("Successful POST to create FigurePaper")
 		return GeneralResponse{Message: "FigurePaper created successfully"}, nil
 	}
 }
@@ -125,10 +126,10 @@ func UpdateFigurePaper(figurePaperId int, body io.Reader) (interface{}, error) {
 	`
 	_, err = database.DB.Exec(query, figurePaperId, fp.PaperId, fp.FigureId)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return GeneralResponse{Message: err.Error()}, err
 	} else {
-		fmt.Println("Successful PUT/PATCH to update FigurePaper")
+		log.Println("Successful PUT/PATCH to update FigurePaper")
 		return GeneralResponse{Message: "FigurePaper updated successfully"}, nil
 	}
 }
