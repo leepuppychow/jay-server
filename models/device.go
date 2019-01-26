@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type Device struct {
@@ -73,7 +74,7 @@ func FindDevice(deviceId int) (interface{}, error) {
 	)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	device := Device{
 		Id:        id,
@@ -89,7 +90,7 @@ func CreateDevice(body io.Reader) (interface{}, error) {
 	var d Device
 	err := json.NewDecoder(body).Decode(&d)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
 		INSERT INTO devices (name, created_at, updated_at)
@@ -98,10 +99,10 @@ func CreateDevice(body io.Reader) (interface{}, error) {
 	_, err = database.DB.Exec(query, d.Name)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
 		log.Println("Successful POST to create device")
-		return GeneralResponse{Message: "Device created successfully"}, nil
+		return h.GeneralResponse{Message: "Device created successfully"}, nil
 	}
 }
 
@@ -119,25 +120,25 @@ func UpdateDevice(deviceId int, body io.Reader) (interface{}, error) {
 	_, err = database.DB.Exec(query, deviceId, d.Name)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
 		log.Println("Successful PUT/PATCH to update device")
-		return GeneralResponse{Message: "Device updated successfully"}, nil
+		return h.GeneralResponse{Message: "Device updated successfully"}, nil
 	}
 }
 
-func DeleteDevice(deviceId int) (GeneralResponse, error) {
+func DeleteDevice(deviceId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM devices WHERE id=$1`
 	res, err := database.DB.Exec(query, deviceId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete device with id %d", deviceId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "Device deleted successfully"}, nil
+	return h.GeneralResponse{Message: "Device deleted successfully"}, nil
 }
 
 func GetDevicesForPaper(paperId int) <-chan []Device {

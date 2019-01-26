@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type Submission struct {
@@ -67,8 +68,8 @@ func GetAllSubmissions() ([]Submission, error) {
 			PaperId:             paper_id,
 			JournalId:           journal_id,
 			Attempt:             attempt,
-			ManuscriptSubmitted: NullTimeCheck(manuscript_submitted),
-			ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
+			ManuscriptSubmitted: h.NullTimeCheck(manuscript_submitted),
+			ManuscriptRejected:  h.NullTimeCheck(manuscript_rejected),
 			CreatedAt:           created_at.String(),
 			UpdatedAt:           updated_at.String(),
 			Journal:             journal,
@@ -112,15 +113,15 @@ func FindSubmission(submissionId int) (interface{}, error) {
 	)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	s := Submission{
 		Id:                  id,
 		PaperId:             paper_id,
 		JournalId:           journal_id,
 		Attempt:             attempt,
-		ManuscriptSubmitted: NullTimeCheck(manuscript_submitted),
-		ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
+		ManuscriptSubmitted: h.NullTimeCheck(manuscript_submitted),
+		ManuscriptRejected:  h.NullTimeCheck(manuscript_rejected),
 		CreatedAt:           created_at.String(),
 		UpdatedAt:           updated_at.String(),
 		Journal:             journal,
@@ -148,8 +149,8 @@ func CreateSubmissionQuery(s Submission) (int, error) {
 		s.PaperId,
 		s.JournalId,
 		s.Attempt,
-		InvalidTimeWillBeNull(s.ManuscriptSubmitted),
-		InvalidTimeWillBeNull(s.ManuscriptRejected),
+		h.InvalidTimeWillBeNull(s.ManuscriptSubmitted),
+		h.InvalidTimeWillBeNull(s.ManuscriptRejected),
 	).Scan(&lastInsertId)
 
 	return lastInsertId, err
@@ -159,15 +160,15 @@ func CreateSubmission(body io.Reader) (interface{}, error) {
 	var s Submission
 	err := json.NewDecoder(body).Decode(&s)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	lastInsertId, err := CreateSubmissionQuery(s)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
 		log.Println("Successful POST to create Submission", lastInsertId)
-		return GeneralResponse{Message: "Submission created successfully"}, nil
+		return h.GeneralResponse{Message: "Submission created successfully"}, nil
 	}
 }
 
@@ -196,25 +197,25 @@ func UpdateSubmission(submissionId int, body io.Reader) (interface{}, error) {
 	)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
 		log.Println("Successful PUT/PATCH to update Submission")
-		return GeneralResponse{Message: "Submission updated successfully"}, nil
+		return h.GeneralResponse{Message: "Submission updated successfully"}, nil
 	}
 }
 
-func DeleteSubmission(submissionId int) (GeneralResponse, error) {
+func DeleteSubmission(submissionId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM submissions WHERE id=$1`
 	res, err := database.DB.Exec(query, submissionId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete Submission with id %d", submissionId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "Submission deleted successfully"}, nil
+	return h.GeneralResponse{Message: "Submission deleted successfully"}, nil
 }
 
 func GetSubmissionsForPaper(paperId int) <-chan []Submission {
@@ -263,8 +264,8 @@ func GetSubmissionsForPaper(paperId int) <-chan []Submission {
 				PaperId:             paper_id,
 				JournalId:           journal_id,
 				Attempt:             attempt,
-				ManuscriptSubmitted: NullTimeCheck(manuscript_submitted),
-				ManuscriptRejected:  NullTimeCheck(manuscript_rejected),
+				ManuscriptSubmitted: h.NullTimeCheck(manuscript_submitted),
+				ManuscriptRejected:  h.NullTimeCheck(manuscript_rejected),
 				CreatedAt:           created_at.String(),
 				UpdatedAt:           updated_at.String(),
 				Journal:             journal,

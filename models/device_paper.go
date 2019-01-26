@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/leepuppychow/jay_medtronic/database"
+	h "github.com/leepuppychow/jay_medtronic/helpers"
 )
 
 type DevicePaper struct {
@@ -79,7 +80,7 @@ func FindDevicePaper(devicePaperId int) (interface{}, error) {
 	)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	dp := DevicePaper{
 		Id:        id,
@@ -110,15 +111,15 @@ func CreateDevicePaper(body io.Reader) (interface{}, error) {
 	var dp DevicePaper
 	err := json.NewDecoder(body).Decode(&dp)
 	if err != nil {
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	_, err = CreateDevicePaperQuery(dp)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
 		log.Println("Successful POST to create DevicePaper")
-		return GeneralResponse{Message: "DevicePaper created successfully"}, nil
+		return h.GeneralResponse{Message: "DevicePaper created successfully"}, nil
 	}
 }
 
@@ -137,23 +138,23 @@ func UpdateDevicePaper(devicePaperId int, body io.Reader) (interface{}, error) {
 	_, err = database.DB.Exec(query, devicePaperId, dp.PaperId, dp.DeviceId)
 	if err != nil {
 		log.Println(err)
-		return GeneralResponse{Message: err.Error()}, err
+		return h.GeneralResponse{Message: err.Error()}, err
 	} else {
 		log.Println("Successful PUT/PATCH to update DevicePaper")
-		return GeneralResponse{Message: "DevicePaper updated successfully"}, nil
+		return h.GeneralResponse{Message: "DevicePaper updated successfully"}, nil
 	}
 }
 
-func DeleteDevicePaper(devicePaperId int) (GeneralResponse, error) {
+func DeleteDevicePaper(devicePaperId int) (h.GeneralResponse, error) {
 	query := `DELETE FROM device_papers WHERE id=$1`
 	res, err := database.DB.Exec(query, devicePaperId)
 	rowCount, err := res.RowsAffected()
 	if rowCount == 0 {
 		errorMessage := fmt.Sprintf("Error when trying to delete DevicePaper with id %d", devicePaperId)
 		err = errors.New("Did not find row with specified ID")
-		return GeneralResponse{Message: errorMessage}, err
+		return h.GeneralResponse{Message: errorMessage}, err
 	} else if err != nil {
-		return GeneralResponse{Message: "Error with DELETE request"}, err
+		return h.GeneralResponse{Message: "Error with DELETE request"}, err
 	}
-	return GeneralResponse{Message: "DevicePaper deleted successfully"}, nil
+	return h.GeneralResponse{Message: "DevicePaper deleted successfully"}, nil
 }
