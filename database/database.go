@@ -10,7 +10,7 @@ import (
 var DB *sql.DB
 
 func InitDB(conn string) {
-	log.Println("Database connection initialized", conn)
+	log.Println("Database connection initialized")
 	DB, _ = sql.Open("postgres", conn)
 	err := DB.Ping()
 	if err != nil {
