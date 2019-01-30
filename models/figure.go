@@ -17,6 +17,8 @@ type Figure struct {
 	Name       string `json:"name"`
 	FigureType string `json:"figure_type"`
 	ImageFile  string `json:"image_file"`
+	StartDate  string `json:"start_date"`
+	EndDate    string `json:"end_date"`
 	CreatedAt  string `json:"created_at"`
 	UpdatedAt  string `json:"updated_at"`
 }
@@ -28,6 +30,8 @@ func GetAllFigures() ([]Figure, error) {
 		name        string
 		figure_type string
 		image_file  string
+		start_date  time.Time
+		end_date    time.Time
 		created_at  time.Time
 		updated_at  time.Time
 	)
@@ -43,6 +47,8 @@ func GetAllFigures() ([]Figure, error) {
 			&name,
 			&figure_type,
 			&image_file,
+			&start_date,
+			&end_date,
 			&created_at,
 			&updated_at,
 		)
@@ -54,6 +60,8 @@ func GetAllFigures() ([]Figure, error) {
 			Name:       name,
 			FigureType: figure_type,
 			ImageFile:  image_file,
+			StartDate:  start_date.String(),
+			EndDate:    end_date.String(),
 			CreatedAt:  created_at.String(),
 			UpdatedAt:  updated_at.String(),
 		}
@@ -72,6 +80,8 @@ func FindFigure(figureId int) (interface{}, error) {
 		name        string
 		figure_type string
 		image_file  string
+		start_date  time.Time
+		end_date    time.Time
 		created_at  time.Time
 		updated_at  time.Time
 	)
@@ -81,6 +91,8 @@ func FindFigure(figureId int) (interface{}, error) {
 		&name,
 		&figure_type,
 		&image_file,
+		&start_date,
+		&end_date,
 		&created_at,
 		&updated_at,
 	)
@@ -93,6 +105,8 @@ func FindFigure(figureId int) (interface{}, error) {
 		Name:       name,
 		FigureType: figure_type,
 		ImageFile:  image_file,
+		StartDate:  start_date.String(),
+		EndDate:    end_date.String(),
 		CreatedAt:  created_at.String(),
 		UpdatedAt:  updated_at.String(),
 	}
@@ -107,10 +121,16 @@ func CreateFigure(body io.Reader) (interface{}, error) {
 		return h.GeneralResponse{Message: err.Error()}, err
 	}
 	query := `
-		INSERT INTO figures (name, figure_type, image_file, created_at, updated_at)
-		VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		INSERT INTO figures (name, figure_type, image_file, start_date, end_date, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 	`
-	_, err = database.DB.Exec(query, f.Name, f.FigureType, f.ImageFile)
+	_, err = database.DB.Exec(query,
+		f.Name,
+		f.FigureType,
+		f.ImageFile,
+		f.StartDate,
+		f.EndDate,
+	)
 	if err != nil {
 		log.Println(err)
 		return h.GeneralResponse{Message: err.Error()}, err
@@ -129,11 +149,13 @@ func UpdateFigure(figureId int, body io.Reader) (interface{}, error) {
 			name = $2,
 			figure_type = $3,
 			image_file = $4,
+			start_date = $5,
+			end_date = $6,
 			updated_at = CURRENT_TIMESTAMP
 		WHERE
 			Figures.id = $1
 	`
-	_, err = database.DB.Exec(query, figureId, f.Name, f.FigureType, f.ImageFile)
+	_, err = database.DB.Exec(query, figureId, f.Name, f.FigureType, f.ImageFile, f.StartDate, f.EndDate)
 	if err != nil {
 		log.Println(err)
 		return h.GeneralResponse{Message: err.Error()}, err
