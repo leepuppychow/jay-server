@@ -13,14 +13,15 @@ import (
 )
 
 type Figure struct {
-	Id         int    `json:"id"`
-	Name       string `json:"name"`
-	FigureType string `json:"figure_type"`
-	ImageFile  string `json:"image_file"`
-	StartDate  string `json:"start_date"`
-	EndDate    string `json:"end_date"`
-	CreatedAt  string `json:"created_at"`
-	UpdatedAt  string `json:"updated_at"`
+	Id         int     `json:"id"`
+	Name       string  `json:"name"`
+	FigureType string  `json:"figure_type"`
+	ImageFile  string  `json:"image_file"`
+	StartDate  string  `json:"start_date"`
+	EndDate    string  `json:"end_date"`
+	CreatedAt  string  `json:"created_at"`
+	UpdatedAt  string  `json:"updated_at"`
+	Papers     []Paper `json:"papers"`
 }
 
 func GetAllFigures() ([]Figure, error) {
@@ -64,6 +65,7 @@ func GetAllFigures() ([]Figure, error) {
 			EndDate:    end_date.String(),
 			CreatedAt:  created_at.String(),
 			UpdatedAt:  updated_at.String(),
+			Papers:     <-GetPapersForFigure(id),
 		}
 		figures = append(figures, figure)
 	}
@@ -109,9 +111,28 @@ func FindFigure(figureId int) (interface{}, error) {
 		EndDate:    end_date.String(),
 		CreatedAt:  created_at.String(),
 		UpdatedAt:  updated_at.String(),
+		Papers:     <-GetPapersForFigure(figureId),
 	}
 	log.Println("Successful GET to find figure:", id)
 	return figure, nil
+}
+
+func GetPapersForFigure(figureId int) <-chan []Paper {
+	ch := make(chan []Paper)
+	go func() {
+		query := fmt.Sprintf(`
+			SELECT papers.*, studies.name AS study FROM papers 
+			INNER JOIN studies ON papers.study_id = studies.id
+			INNER JOIN figure_papers ON papers.id = figure_papers.paper_id
+			WHERE figure_papers.figure_id = %d
+		`, figureId)
+		papers, err := GetAllPapers(query)
+		if err != nil {
+			log.Printf(err.Error())
+		}
+		ch <- papers
+	}()
+	return ch
 }
 
 func CreateFigure(body io.Reader) (interface{}, error) {
@@ -188,6 +209,8 @@ func GetFiguresForPaper(paperId int) <-chan []Figure {
 			name        string
 			figure_type string
 			image_file  string
+			start_date  time.Time
+			end_date    time.Time
 			created_at  time.Time
 			updated_at  time.Time
 		)
@@ -208,6 +231,8 @@ func GetFiguresForPaper(paperId int) <-chan []Figure {
 				&name,
 				&figure_type,
 				&image_file,
+				&start_date,
+				&end_date,
 				&created_at,
 				&updated_at,
 			)
@@ -219,6 +244,8 @@ func GetFiguresForPaper(paperId int) <-chan []Figure {
 				Name:       name,
 				FigureType: figure_type,
 				ImageFile:  image_file,
+				StartDate:  start_date.String(),
+				EndDate:    end_date.String(),
 				CreatedAt:  created_at.String(),
 				UpdatedAt:  updated_at.String(),
 			}

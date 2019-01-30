@@ -44,7 +44,12 @@ type PaperResponse struct {
 	Message string `json:"message"`
 }
 
-func GetAllPapers() ([]Paper, error) {
+var PaperIndexQuery = `
+	SELECT papers.*, studies.name AS study FROM papers 
+	INNER JOIN studies ON papers.study_id = studies.id
+`
+
+func GetAllPapers(query string) ([]Paper, error) {
 	var papers []Paper
 	var (
 		id                        int
@@ -65,10 +70,6 @@ func GetAllPapers() ([]Paper, error) {
 		updated_at                time.Time
 		study                     string
 	)
-	query := `
-		SELECT papers.*, studies.name AS study FROM papers 
-		INNER JOIN studies ON papers.study_id = studies.id
-	`
 	rows, err := database.DB.Query(query)
 	if err != nil {
 		log.Println(err)
@@ -130,7 +131,7 @@ func GetAllPapers() ([]Paper, error) {
 	return papers, nil
 }
 
-func FindPaper(paperId int) (interface{}, error) {
+func FindPaper(paperId int) (Paper, error) {
 	var (
 		id                        int
 		study_id                  int
@@ -201,7 +202,7 @@ func FindPaper(paperId int) (interface{}, error) {
 
 	if err != nil {
 		log.Println(err)
-		return h.GeneralResponse{Message: "Error finding paper"}, err
+		return Paper{}, err
 	}
 	return paper, nil
 }
