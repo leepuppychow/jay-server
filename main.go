@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/leepuppychow/jay_medtronic/database"
-	"github.com/leepuppychow/jay_medtronic/routes"
+	"github.com/leepuppychow/jay-server/database"
+	"github.com/leepuppychow/jay-server/routes"
 
 	"github.com/gorilla/handlers"
 )
-
-var DevelopmentDB = "user=leechow dbname=jay_medtronic_development sslmode=disable host=localhost port=5432 timezone=utc"
 
 func main() {
 	port := 3000
@@ -21,8 +19,7 @@ func main() {
 
 	dbConn, ok := os.LookupEnv("DB_CONN")
 	if !ok {
-		log.Println("Using development DB")
-		dbConn = DevelopmentDB
+		log.Fatal("Unable to connect to database")
 	}
 	database.InitDB(dbConn)
 

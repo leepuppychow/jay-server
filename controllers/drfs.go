@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	h "github.com/leepuppychow/jay_medtronic/helpers"
-	"github.com/leepuppychow/jay_medtronic/models"
+	h "github.com/leepuppychow/jay-server/helpers"
+	"github.com/leepuppychow/jay-server/models"
 )
 
 func DataRequestFormsIndex(w http.ResponseWriter, r *http.Request) {

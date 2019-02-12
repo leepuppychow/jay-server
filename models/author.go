@@ -8,8 +8,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/leepuppychow/jay_medtronic/database"
-	h "github.com/leepuppychow/jay_medtronic/helpers"
+	"github.com/leepuppychow/jay-server/database"
+	h "github.com/leepuppychow/jay-server/helpers"
 )
 
 type Author struct {

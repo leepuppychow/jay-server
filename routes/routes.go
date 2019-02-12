@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	_ "github.com/leepuppychow/jay_medtronic/auth"
-	"github.com/leepuppychow/jay_medtronic/controllers"
+	"github.com/leepuppychow/jay-server/auth"
+	"github.com/leepuppychow/jay-server/controllers"
 )
 
 type Route struct {
@@ -97,7 +97,7 @@ var routes = Routes{
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	// router.Use(auth.AuthCheck) // Middleware to check token
+	router.Use(auth.AuthCheck) // Middleware to check token
 	for _, route := range routes {
 		router.
 			Methods(route.Method).

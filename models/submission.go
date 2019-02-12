@@ -10,8 +10,8 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/leepuppychow/jay_medtronic/database"
-	h "github.com/leepuppychow/jay_medtronic/helpers"
+	"github.com/leepuppychow/jay-server/database"
+	h "github.com/leepuppychow/jay-server/helpers"
 )
 
 type Submission struct {

@@ -7,8 +7,8 @@ import (
 	"io"
 	"log"
 
-	"github.com/leepuppychow/jay_medtronic/auth"
-	"github.com/leepuppychow/jay_medtronic/database"
+	"github.com/leepuppychow/jay-server/auth"
+	"github.com/leepuppychow/jay-server/database"
 	"github.com/raja/argon2pw"
 )
 

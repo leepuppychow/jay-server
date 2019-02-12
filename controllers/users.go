@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/leepuppychow/jay_medtronic/auth"
-	h "github.com/leepuppychow/jay_medtronic/helpers"
-	"github.com/leepuppychow/jay_medtronic/models"
+	"github.com/leepuppychow/jay-server/auth"
+	h "github.com/leepuppychow/jay-server/helpers"
+	"github.com/leepuppychow/jay-server/models"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
