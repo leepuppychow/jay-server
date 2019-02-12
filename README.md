@@ -1,7 +1,8 @@
-## TESTING
+## Practice building a RESTful API in Golang:
 
-* To recursively search for all test files, run:
+The goal of this project was to practice building a RESTful API in Go with a PostgreSQL database.
+I also wanted to experiment with a couple 3rd party packages to generate JWTs and to encrypt/decrypt passwords with Argon2.
 
-```
-go test ./...
-```
+Other learning points were:
+* Practice with concurrency in Go
+* Practice deploying server with Docker and Amazon Elastic Beanstalk
