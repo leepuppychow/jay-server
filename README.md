@@ -6,3 +6,5 @@ I also wanted to experiment with a couple 3rd party packages to generate JWTs an
 Other learning points were:
 * Practice with concurrency in Go
 * Practice deploying server with Docker and Amazon Elastic Beanstalk
+
+*I am currently in the process of adding more tests!*
