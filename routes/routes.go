@@ -95,9 +95,12 @@ var routes = Routes{
 	{"DeleteDevicePaper", "DELETE", "/api/v1/device_papers/{id}", controllers.DeleteDevicePaper},
 }
 
-func NewRouter() *mux.Router {
+func NewRouter(useAuth bool) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.Use(auth.AuthCheck) // Middleware to check token
+	if useAuth {
+		router.Use(auth.AuthCheck) // Middleware to check token
+	}
+
 	for _, route := range routes {
 		router.
 			Methods(route.Method).
