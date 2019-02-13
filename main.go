@@ -14,7 +14,7 @@ import (
 
 func main() {
 	port := 3000
-	router := routes.NewRouter()
+	router := routes.NewRouter(true) // parameter here is to use authentication middleware
 	log.Println("Server running on port:", port)
 
 	dbConn, ok := os.LookupEnv("DB_CONN")
