@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -32,10 +33,15 @@ func ExecuteQuery(query string) {
 	}
 }
 
-func TestPapersIndex(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/papers", nil)
+func RunTestRequest(verb, route string, body io.Reader) *httptest.ResponseRecorder {
+	req, _ := http.NewRequest(verb, route, body)
 	respRecorder := httptest.NewRecorder()
 	router.ServeHTTP(respRecorder, req)
+	return respRecorder
+}
+
+func TestPapersIndex(t *testing.T) {
+	respRecorder := RunTestRequest("GET", "/api/v1/papers", nil)
 
 	if respRecorder.Code != 200 {
 		t.Errorf("GET to papers index failed")
@@ -44,9 +50,7 @@ func TestPapersIndex(t *testing.T) {
 
 func TestPapersShow(t *testing.T) {
 	var paper models.Paper
-	req, _ := http.NewRequest("GET", "/api/v1/papers/3", nil)
-	respRecorder := httptest.NewRecorder()
-	router.ServeHTTP(respRecorder, req)
+	respRecorder := RunTestRequest("GET", "/api/v1/papers/3", nil)
 	json.Unmarshal(respRecorder.Body.Bytes(), &paper)
 
 	if respRecorder.Code != 200 || paper.Id != 3 {
@@ -58,13 +62,9 @@ func TestPapersShow(t *testing.T) {
 	}
 
 	// Non-existent paper
-	req, _ = http.NewRequest("GET", "/api/v1/papers/1000", nil)
-	respRecorder = httptest.NewRecorder()
-	router.ServeHTTP(respRecorder, req)
-	json.Unmarshal(respRecorder.Body.Bytes(), &paper)
+	respRecorder = RunTestRequest("GET", "/api/v1/papers/1000", nil)
 
 	if respRecorder.Code != 400 {
 		t.Errorf("GET to papers show failed")
 	}
-
 }
