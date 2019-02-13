@@ -42,15 +42,32 @@ func RunTestRequest(verb, route string, body io.Reader) *httptest.ResponseRecord
 
 func TestPapersIndex(t *testing.T) {
 	respRecorder := RunTestRequest("GET", "/api/v1/papers", nil)
+	var papers []models.Paper
+	json.Unmarshal(respRecorder.Body.Bytes(), &papers)
 
 	if respRecorder.Code != 200 {
 		t.Errorf("GET to papers index failed")
 	}
+	if len(papers) != 3 {
+		t.Errorf("GET to papers index failed")
+	}
+}
+
+func TestPapersIndexUnauthorized(t *testing.T) {
+	router = routes.NewRouter(true) // use Auth middleware, but secret environment variable is not present
+	respRecorder := RunTestRequest("GET", "/api/v1/papers", nil)
+	var papers []models.Paper
+	json.Unmarshal(respRecorder.Body.Bytes(), &papers)
+
+	if respRecorder.Code != 401 {
+		t.Errorf("GET to papers index (without proper authorization) failed")
+	}
+	router = routes.NewRouter(false)
 }
 
 func TestPapersShow(t *testing.T) {
-	var paper models.Paper
 	respRecorder := RunTestRequest("GET", "/api/v1/papers/3", nil)
+	var paper models.Paper
 	json.Unmarshal(respRecorder.Body.Bytes(), &paper)
 
 	if respRecorder.Code != 200 || paper.Id != 3 {
