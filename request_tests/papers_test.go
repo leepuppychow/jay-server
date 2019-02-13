@@ -1,15 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/gorilla/mux"
 	"github.com/leepuppychow/jay-server/database"
+	"github.com/leepuppychow/jay-server/models"
 	"github.com/leepuppychow/jay-server/routes"
 )
 
@@ -38,15 +40,20 @@ func TestPapersIndex(t *testing.T) {
 	if respRecorder.Code != 200 {
 		t.Errorf("GET to papers index failed")
 	}
-	fmt.Println(respRecorder.Body)
 }
 
 func TestPapersShow(t *testing.T) {
+	var paper models.Paper
 	req, _ := http.NewRequest("GET", "/api/v1/papers/3", nil)
 	respRecorder := httptest.NewRecorder()
 	router.ServeHTTP(respRecorder, req)
+	json.Unmarshal(respRecorder.Body.Bytes(), &paper)
 
-	if respRecorder.Code != 200 {
+	if respRecorder.Code != 200 || paper.Id != 3 {
+		t.Errorf("GET to papers show failed")
+	}
+
+	if reflect.TypeOf(paper.Title).Kind() != reflect.String {
 		t.Errorf("GET to papers show failed")
 	}
 
@@ -54,8 +61,10 @@ func TestPapersShow(t *testing.T) {
 	req, _ = http.NewRequest("GET", "/api/v1/papers/1000", nil)
 	respRecorder = httptest.NewRecorder()
 	router.ServeHTTP(respRecorder, req)
+	json.Unmarshal(respRecorder.Body.Bytes(), &paper)
 
 	if respRecorder.Code != 400 {
 		t.Errorf("GET to papers show failed")
 	}
+
 }
