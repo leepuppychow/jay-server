@@ -7,4 +7,4 @@ Other learning points were:
 * Practice with concurrency in Go
 * Practice deploying server with Docker and Amazon Elastic Beanstalk
 
-* I need to add more tests, but got distracted on some other projects!! *
+*I need to add more tests, but got distracted on some other projects!!*
